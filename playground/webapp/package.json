@@ -39,7 +39,7 @@
     "@ddd-qc/agent-directory": "6.0.0",
     "@holochain-open-dev/core-types": "^0.6.3",
     "@lit-labs/context": "0.2.0",
-    "@membranes/elements": "file:../../webcomponents",
+    "@path-explorer/elements": "file:../../webcomponents",
     "lit": "2.6.0"
   }
 }

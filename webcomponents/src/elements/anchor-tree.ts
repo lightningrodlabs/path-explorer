@@ -19,11 +19,7 @@ import "@ui5/webcomponents/dist/features/InputSuggestions.js";
 import {Base64} from "js-base64";
 import {PathExplorerZvm} from "../viewModels/path-explorer.zvm";
 import {TypedAnchor} from "../bindings/path-explorer.types";
-
-
-
-export declare type AnyLinkableHashB64 = HoloHashB64;
-
+import {AnyLinkableHashB64} from "../utils";
 
 
 const ZOME_LINK_NAMES = [""]; // FIXME Object.keys(ThreadsLinkTypeType);

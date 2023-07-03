@@ -1,3 +1,8 @@
+import {HoloHashB64} from "@holochain/client";
+
+export declare type AnyLinkableHashB64 = HoloHashB64;
+
+
 
 /** */
 export function utf32Decode(bytes: Uint8Array) {

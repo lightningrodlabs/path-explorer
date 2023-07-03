@@ -2,6 +2,7 @@ import { html } from "lit";
 import {property, state} from "lit/decorators.js";
 import {TaskerPage} from "./elements/tasker-page";
 import {AgentDirectoryList} from "@ddd-qc/agent-directory";
+import {PathsDashboard} from "@path-explorer/elements";
 import { TaskerDvm } from "./viewModel/tasker.dvm";
 import {
   HvmDef, HappElement, HCL, ViewCellContext, CellDef, CellContext, delay, Cell
@@ -72,22 +73,6 @@ export class TaskerApp extends HappElement {
   }
 
 
-  /** */
-  async cloneTasker() {
-    const cellDef: CellDef = {
-      cloneName: "My Kingdom",
-      modifiers: {
-        properties: {
-          progenitors: [this.taskerDvm.cell.agentPubKey],
-        },
-      }
-    }
-    await this.createClone(TaskerDvm.DEFAULT_BASE_ROLE_NAME, cellDef);
-    console.log({clones: this.taskerDvmClones});
-    const myWorldDvm = this.taskerDvmClone(TaskerDvm.DEFAULT_BASE_ROLE_NAME + '.0');
-    this._cell = myWorldDvm.cell;
-  }
-
 
   /** */
   render() {
@@ -102,13 +87,8 @@ export class TaskerApp extends HappElement {
     let page;
     switch (this._pageDisplayIndex) {
       case 0: page = html`<tasker-page style="flex: 1;"></tasker-page>` ; break;
-      case 1: page = html`<membranes-dashboard .allAppEntryTypes=${this._allAppEntryTypes} style="flex: 1;"></membranes-dashboard>`; break;
-      case 2: page = html`<membranes-creator-page .allAppEntryTypes=${this._allAppEntryTypes} style="flex: 1;"></membranes-creator-page>`; break;
-      case 3: page = html`<vouch-dashboard .knownAgents=${knownAgents} style="flex: 1;"></vouch-dashboard>`; break;
-      case 4: page = html`<create-entry-dashboard .knownAgents=${knownAgents} .zomeIndexes="${this._dnaDef?.coordinator_zomes}" .allAppEntryTypes=${this._allAppEntryTypes} style="flex: 1;"></create-entry-dashboard>`; break;
-      case 5: page = html`<create-vouch-threshold style="flex: 1;"></create-vouch-threshold>`; break;
-      case 6: page = html`<create-cec-threshold .allAppEntryTypes=${this._allAppEntryTypes} .zomeNames=${zomeNames} style="flex: 1;"></create-cec-threshold>`; break;
-      case 7: page = html`<agent-directory-list style="flex: 1;"></agent-directory-list>`; break;
+      case 1: page = html`<paths-dashboard .allAppEntryTypes=${this._allAppEntryTypes} style="flex: 1;"></paths-dashboard>`; break;
+      case 2: page = html`<agent-directory-list style="flex: 1;"></agent-directory-list>`; break;
 
       default: page = html`unknown page index`;
     };
@@ -119,15 +99,9 @@ export class TaskerApp extends HappElement {
         <div>
           <view-cell-context></view-cell-context>
           <input type="button" value="Tasker" @click=${() => {this._pageDisplayIndex = 0; this.requestUpdate()}} >
-          <input type="button" value="Membranes Dashboard" @click=${() => {this._pageDisplayIndex = 1; this.requestUpdate()}} >
-          <input type="button" value="Membranes Creator" @click=${() => {this._pageDisplayIndex = 2; this.requestUpdate()}} >
-          <input type="button" value="Vouch Dashboard" @click=${() => {this._pageDisplayIndex = 3; this.requestUpdate()}} >
-          <input type="button" value="CreateEntry Dashboard" @click=${() => {this._pageDisplayIndex = 4; this.requestUpdate()}} >
-          <input type="button" value="Create Vouch Threshold" @click=${() => {this._pageDisplayIndex = 5; this.requestUpdate()}} >
-          <input type="button" value="Create CEC Threshold" @click=${() => {this._pageDisplayIndex = 6; this.requestUpdate()}} >
-          <input type="button" value="Agent Directory" @click=${() => {this._pageDisplayIndex = 7; this.requestUpdate()}} >
+          <input type="button" value="Paths Dashboard" @click=${() => {this._pageDisplayIndex = 1; this.requestUpdate()}} >
+          <input type="button" value="Agent Directory" @click=${() => {this._pageDisplayIndex = 2; this.requestUpdate()}} >
         </div>
-        <input type="button" value="Make me king!" @click=${() => {this.cloneTasker()}}>
         <button type="button" @click=${this.refresh}>Refresh</button>
         <span><b>Agent:</b> ${this.taskerDvm.cell.agentPubKey}</span>
         <hr class="solid">      
