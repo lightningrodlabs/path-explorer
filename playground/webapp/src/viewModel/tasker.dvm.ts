@@ -1,11 +1,9 @@
 import { DnaViewModel, ZvmDef } from "@ddd-qc/lit-happ";
-import { MembranesZvm, VouchZvm, CreateEntryCountZvm } from "@membranes/elements";
 import {TaskerZvm} from "./tasker.zvm"
 import {AgentDirectoryZvm} from "@ddd-qc/agent-directory"
 import {AppSignalCb} from "@holochain/client";
+import {PathExplorerZvm} from "@path-explorer/elements/dist/viewModels/path-explorer.zvm";
 
-
-export const MEMBRANES_ZOME_NAME = "zMembranes";
 
 /**
  * TODO: Make a "passthrough" DVM generator in dna-client based on ZVM_DEFS
@@ -17,10 +15,8 @@ export const MEMBRANES_ZOME_NAME = "zMembranes";
   static readonly DEFAULT_BASE_ROLE_NAME = "rTasker";
   static readonly ZVM_DEFS: ZvmDef[] = [
    TaskerZvm,
-   [MembranesZvm, MEMBRANES_ZOME_NAME],
+   [PathExplorerZvm, "zPathExplorer"],
    [AgentDirectoryZvm, "zAgentDirectory"],
-   CreateEntryCountZvm,
-   VouchZvm,
   ];
 
   readonly signalHandler?: AppSignalCb;
@@ -28,11 +24,9 @@ export const MEMBRANES_ZOME_NAME = "zMembranes";
 
   /** QoL Helpers */
   get taskerZvm(): TaskerZvm {return this.getZomeViewModel(TaskerZvm.DEFAULT_ZOME_NAME) as TaskerZvm}
-  get membranesZvm(): MembranesZvm {return this.getZomeViewModel(MEMBRANES_ZOME_NAME) as MembranesZvm}
+  get pathExplorerZvm(): PathExplorerZvm {return this.getZomeViewModel("zPathExplorer") as PathExplorerZvm}
   get AgentDirectoryZvm(): AgentDirectoryZvm {return this.getZomeViewModel("zAgentDirectory") as AgentDirectoryZvm}
 
-  get createEntryCountZvm(): CreateEntryCountZvm {return this.getZomeViewModel(CreateEntryCountZvm.DEFAULT_ZOME_NAME) as CreateEntryCountZvm}
-  get vouchZvm(): VouchZvm {return this.getZomeViewModel(VouchZvm.DEFAULT_ZOME_NAME) as VouchZvm}
 
   /** -- ViewModel Interface -- */
 

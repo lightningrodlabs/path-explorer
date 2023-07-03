@@ -1,7 +1,7 @@
 use hdk::prelude::*;
 
 ///
-pub(crate) fn get_zome_index(zome_name: &str) -> u8 {
+pub fn get_zome_index(zome_name: &str) -> u8 {
   let threads_name = ZomeName::from(zome_name);
   let zome_names = dna_info().unwrap().zome_names;
   let mut i = 0;

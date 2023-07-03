@@ -1,12 +1,6 @@
 import { html } from "lit";
 import {property, state} from "lit/decorators.js";
 import {TaskerPage} from "./elements/tasker-page";
-import {
-  VouchDashboard,
-  MembranesDashboard,
-  MembranesCreatorPage,
-  CreateEntryDashboard, CreateVouchThreshold, CreateCecThreshold,
-} from "@membranes/elements";
 import {AgentDirectoryList} from "@ddd-qc/agent-directory";
 import { TaskerDvm } from "./viewModel/tasker.dvm";
 import {
@@ -51,8 +45,8 @@ export class TaskerApp extends HappElement {
   private _dnaDef?: DnaDefinition;
 
   /** */
-  async happInitialized() {
-    console.log("happInitialized()")
+  async hvmConstructed() {
+    console.log("hvmConstructed()")
     //new ContextProvider(this, cellContext, this.taskerDvm.cell);
     /** Authorize all zome calls */
     const adminWs = await AdminWebsocket.connect(`ws://localhost:${process.env.ADMIN_PORT}`);
@@ -61,7 +55,7 @@ export class TaskerApp extends HappElement {
     console.log("*** Zome call authorization complete");
     this._dnaDef = await adminWs.getDnaDefinition(this.taskerDvm.cell.id[0]);
     console.log("happInitialized() dnaDef", this._dnaDef);
-    /** Probe */    
+    /** Probe */
     this._cell = this.taskerDvm.cell;
     await this.hvm.probeAll();
     this._allAppEntryTypes = await this.taskerDvm.fetchAllEntryDefs();
@@ -97,7 +91,7 @@ export class TaskerApp extends HappElement {
 
   /** */
   render() {
-    console.log("*** <tasker-app> render()", this._loaded, this.taskerDvm.membranesZvm.perspective)
+    console.log("*** <tasker-app> render()", this._loaded, this.taskerDvm.pathExplorerZvm.perspective)
     if (!this._loaded) {
       return html`<span>Loading...</span>`;
     }
@@ -140,21 +134,5 @@ export class TaskerApp extends HappElement {
         ${page}
       </cell-context>        
     `
-  }
-
-  /** */
-  static get scopedElements() {
-    return {
-      "tasker-page": TaskerPage,
-      "membranes-dashboard": MembranesDashboard,
-      "membranes-creator-page": MembranesCreatorPage,
-      "vouch-dashboard": VouchDashboard,
-      "create-vouch-threshold": CreateVouchThreshold,
-      "create-cec-threshold": CreateCecThreshold,
-      "create-entry-dashboard": CreateEntryDashboard,
-      "agent-directory-list": AgentDirectoryList,
-      "view-cell-context": ViewCellContext,
-      "cell-context": CellContext,
-    };
   }
 }

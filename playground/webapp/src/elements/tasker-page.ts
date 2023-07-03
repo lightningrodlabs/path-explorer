@@ -1,5 +1,5 @@
 import {css, html} from "lit";
-import {property, state} from "lit/decorators.js";
+import {property, state, customElement} from "lit/decorators.js";
 import { DnaElement } from "@ddd-qc/lit-happ";
 import { TaskerDvm } from "../viewModel/tasker.dvm";
 import {TaskerPerspective, TaskListMaterialized} from "../viewModel/tasker.perspective";
@@ -9,6 +9,7 @@ import {AgentPubKeyB64, encodeHashToBase64, EntryHashB64} from "@holochain/clien
 /**
  * @element tasker-page
  */
+@customElement("tasker-page")
 export class TaskerPage extends DnaElement<unknown, TaskerDvm> {
 
   constructor() {
@@ -87,17 +88,17 @@ export class TaskerPage extends DnaElement<unknown, TaskerDvm> {
 
   /** */
   async onLockList(e: any) {
-    //console.log("onLockList() CALLED", this.selectedListEh)
-    if (!this._selectedListEh) {
-      return;
-    }
-    try {
-      let res = await this._dvm.taskerZvm.lockTaskList(this._selectedListEh!);
-      //console.log("onLockList() res =", res)
-    } catch (e:any) {
-      console.warn(e);
-      alert("Must be editor to lock list 😋")
-    }
+    // //console.log("onLockList() CALLED", this.selectedListEh)
+    // if (!this._selectedListEh) {
+    //   return;
+    // }
+    // try {
+    //   let res = await this._dvm.taskerZvm.lockTaskList(this._selectedListEh!);
+    //   //console.log("onLockList() res =", res)
+    // } catch (e:any) {
+    //   console.warn(e);
+    //   alert("Must be editor to lock list 😋")
+    // }
   }
 
 

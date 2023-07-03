@@ -9,9 +9,7 @@ import {
 } from "@holochain/client";
 import {TaskerProxy} from '../bindings/tasker.proxy';
 import {TaskItem} from '../bindings/tasker.types';
-import {ZomeViewModel, CellProxy} from "@ddd-qc/lit-happ";
-import {MembranesProxy} from "@membranes/elements";
-import {MEMBRANES_ZOME_NAME} from "./tasker.dvm";
+import {ZomeViewModel, CellProxy, DnaViewModel} from "@ddd-qc/lit-happ";
 import {TaskerPerspective, TaskItemMaterialized, TaskListMaterialized} from "./tasker.perspective";
 
 
@@ -25,14 +23,9 @@ export class TaskerZvm extends ZomeViewModel {
   get zomeProxy(): TaskerProxy {return this._zomeProxy as TaskerProxy;}
 
 
-  /** Hack to call Membranes zome from tasker zvm */
-  private _membranesProxy: MembranesProxy;
-
-
-  constructor(cellProxy: CellProxy, zomeName?: ZomeName) {
-    super(cellProxy, zomeName);
-    this._membranesProxy = new MembranesProxy(cellProxy, MEMBRANES_ZOME_NAME);
-  }
+  // constructor(cellProxy: CellProxy, dvmParent: DnaViewModel, zomeName?: ZomeName) {
+  //   super(cellProxy, dvmParent, zomeName);
+  // }
 
 
   /** -- ViewModel -- */
@@ -101,17 +94,6 @@ export class TaskerZvm extends ZomeViewModel {
     /** Get Lists */
     await this.pullAllLists();
 
-
-    /** Get My Roles */
-    let res = await this._membranesProxy.getMyRoleClaimsDetails();
-    let p = Object.values(res).map(async ([_claim_eh, roleClaim]) => {
-      let role = await this._membranesProxy.getRole(roleClaim.roleEh);
-      return role? role.name : "";
-    })
-    Promise.all(p).then((v) => {
-      this._perspective.myRoles = v;
-      this.notifySubscribers()
-    })
     this.notifySubscribers()
   }
 
@@ -137,11 +119,11 @@ export class TaskerZvm extends ZomeViewModel {
     return newList;
   }
 
-  async lockTaskList(eh: EntryHashB64): Promise<ActionHashB64> {
-    let res = encodeHashToBase64(await this.zomeProxy.membranedLockTaskList(decodeHashFromBase64(eh)));
-    this.probeAll();
-    return res;
-  }
+  // async lockTaskList(eh: EntryHashB64): Promise<ActionHashB64> {
+  //   let res = encodeHashToBase64(await this.zomeProxy.membranedLockTaskList(decodeHashFromBase64(eh)));
+  //   this.probeAll();
+  //   return res;
+  // }
 
   async completeTask(eh: EntryHashB64): Promise<ActionHashB64> {
     let res = encodeHashToBase64(await this.zomeProxy.completeTask(decodeHashFromBase64(eh)));
