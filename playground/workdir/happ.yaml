@@ -1,0 +1,12 @@
+---
+manifest_version: "1"
+name: hTasker
+description: Task manager app
+roles:
+  - name: rTasker
+    provisioning:
+      strategy: create
+      deferred: false
+    dna:
+      bundled: ../../tasker.dna
+      clone_limit: 10
