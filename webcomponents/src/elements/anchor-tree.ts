@@ -1,11 +1,8 @@
 import {css, html, PropertyValues, TemplateResult} from "lit";
 import {property, state, customElement} from "lit/decorators.js";
 import {ZomeElement} from "@ddd-qc/lit-happ";
-import {ThreadsZvm} from "../../viewModels/threads.zvm";
-import {ThreadsLinkTypeType, TypedAnchor} from "../../bindings/threads.types";
-import {AnyDhtHashB64, encodeHashToBase64} from "@holochain/client";
+import {AnyDhtHashB64, encodeHashToBase64, HoloHashB64} from "@holochain/client";
 
-import {AnyLinkableHashB64, ThreadsPerspective} from "../../viewModels/threads.perspective";
 
 import Tree from "@ui5/webcomponents/dist/Tree"
 import TreeItem from "@ui5/webcomponents/dist/TreeItem";
@@ -19,16 +16,17 @@ import Input from "@ui5/webcomponents/dist/Input";
 import "@ui5/webcomponents/dist/Input.js";
 import "@ui5/webcomponents/dist/features/InputSuggestions.js";
 
-
-
-
-
-
-
 import {Base64} from "js-base64";
+import {PathExplorerZvm} from "../viewModels/path-explorer.zvm";
+import {TypedAnchor} from "../bindings/path-explorer.types";
 
 
-const ZOME_LINK_NAMES = Object.keys(ThreadsLinkTypeType);
+
+export declare type AnyLinkableHashB64 = HoloHashB64;
+
+
+
+const ZOME_LINK_NAMES = [""]; // FIXME Object.keys(ThreadsLinkTypeType);
 
 export interface LinkTreeItem {
   origin:  AnyLinkableHashB64 | string /* Anchor */,
@@ -64,8 +62,12 @@ function toLinkTreeItem(ti: TreeItem) {
 
 
 /** */
-function toRootTreeItem(lti: LinkTreeItem) {
-  //console.log("toTreeItem()", lti)
+function toRootTreeItem(lti: LinkTreeItem): TemplateResult {
+  //console.log("toRootTreeItem()", lti)
+  if (!lti.linkIndex) {
+    console.warn("toRootTreeItem() aborted. Missing linkIndex argument.");
+    return html``;
+  }
   const id = "anchor__" +  lti.origin;
   const linkTypeName = ZOME_LINK_NAMES[lti.linkIndex]
   return html`<ui5-tree-item id="${id}" text="${lti.origin}" additional-text="{${linkTypeName}}" has-children
@@ -83,10 +85,10 @@ function toRootTreeItem(lti: LinkTreeItem) {
  *    b. with Items
  */
 @customElement("anchor-tree")
-export class AnchorTree extends ZomeElement<ThreadsPerspective, ThreadsZvm> {
+export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
 
   constructor() {
-    super(ThreadsZvm.DEFAULT_ZOME_NAME);
+    super(PathExplorerZvm.DEFAULT_ZOME_NAME);
     //console.log("<anchor-tree>.ctor()")
   }
 
@@ -144,7 +146,7 @@ export class AnchorTree extends ZomeElement<ThreadsPerspective, ThreadsZvm> {
     if (!this._zvm) {
       return;
     }
-    const maybeTree = this.shadowRoot.getElementById("rootAnchorTree") as Tree;
+    const maybeTree = this.shadowRoot!.getElementById("rootAnchorTree") as Tree;
     console.debug("probeRootAnchors()", maybeTree);
     if (maybeTree) {
       //maybeTree.innerHTML = '';
@@ -205,7 +207,7 @@ export class AnchorTree extends ZomeElement<ThreadsPerspective, ThreadsZvm> {
 
   /** onToggle fetch the children of the toggled anchor */
   async toggleTreeItem(event:any) {
-    const busyIndicator = this.shadowRoot.getElementById("busy") as BusyIndicator;
+    const busyIndicator = this.shadowRoot!.getElementById("busy") as BusyIndicator;
     const toggledTreeItem = event.detail.item as TreeItem ; // get the node that is toggled
     const lti = toLinkTreeItem(toggledTreeItem);
     //const isTyped = !!this.root && typeof this.root == 'object';
@@ -229,8 +231,8 @@ export class AnchorTree extends ZomeElement<ThreadsPerspective, ThreadsZvm> {
       console.log("toggleTreeItem() currentItemTexts", currentItemTexts, isTyped);
 
       /** Grab children */
-      let any_children_tas = [];
-      if (isTyped) {
+      let any_children_tas: TypedAnchor[] = [];
+      if (isTyped && lti.origin) {
         any_children_tas = await this._zvm.zomeProxy.getTypedChildren({anchor: lti.origin, zomeIndex: lti.zomeIndex, linkIndex: lti.linkIndex});
       }
       // else {
@@ -268,7 +270,8 @@ export class AnchorTree extends ZomeElement<ThreadsPerspective, ThreadsZvm> {
           itemHashs.push(item.id);
         }
 
-        const itemLinks = await this._zvm.zomeProxy.getAllItems(toggledTreeItem.getAttribute("origin"));
+        const maybeOriginAttribute = toggledTreeItem.getAttribute("origin");
+        const itemLinks = await this._zvm.zomeProxy.getAllItems(maybeOriginAttribute? maybeOriginAttribute : "");
         console.log({itemLinks})
         for (const itemLink of itemLinks) {
           const tag = new TextDecoder().decode(new Uint8Array(itemLink.tag));
@@ -339,14 +342,14 @@ export class AnchorTree extends ZomeElement<ThreadsPerspective, ThreadsZvm> {
   async onScanRoot(e:any) {
     this.root = undefined ;
     await this.probeRootAnchors();
-    const input = this.shadowRoot.getElementById("rootInput") as Input;
+    const input = this.shadowRoot!.getElementById("rootInput") as Input;
     input.value = '';
   }
 
 
   /** */
   async onWalk(e:any) {
-    const input = this.shadowRoot.getElementById("rootInput") as Input;
+    const input = this.shadowRoot!.getElementById("rootInput") as Input;
     if (!input.value) {
       this.root = undefined;
       return;

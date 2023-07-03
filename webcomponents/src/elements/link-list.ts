@@ -1,39 +1,37 @@
 import {css, html, PropertyValues, TemplateResult} from "lit";
 import {property, state, customElement} from "lit/decorators.js";
 import {ScopedZomeTypes, ZomeElement} from "@ddd-qc/lit-happ";
-import {ThreadsZvm} from "../../viewModels/threads.zvm";
-import {ThreadsLinkTypeType} from "../../bindings/threads.types";
 import {AnyDhtHashB64, encodeHashToBase64, ZomeName} from "@holochain/client";
-import {ItemLink} from '../../bindings/deps.types';
-import {ThreadsPerspective} from "../../viewModels/threads.perspective";
-import {utf32Decode} from "./threads-devtest-page";
+import {ItemLink} from '../bindings/deps.types';
 
 import "@ui5/webcomponents/dist/Tree.js"
 import "@ui5/webcomponents/dist/TreeItem.js";
 import "@ui5/webcomponents/dist/BusyIndicator.js";
+import {PathExplorerZvm} from "../viewModels/path-explorer.zvm";
+import {utf32Decode} from "../utils";
 
 
 /**
  * @element
  */
 @customElement("link-list")
-export class LinkList extends ZomeElement<ThreadsPerspective, ThreadsZvm> {
+export class LinkList extends ZomeElement<unknown, PathExplorerZvm> {
 
   constructor() {
-    super(ThreadsZvm.DEFAULT_ZOME_NAME);
-    console.log("<link-list>.ctor()", this.rootHash);
+    super(PathExplorerZvm.DEFAULT_ZOME_NAME);
+    //console.log("<link-list>.ctor()", this.rootHash);
   }
 
 
-  @property() rootHash: AnyDhtHashB64;
+  @property() rootHash?: AnyDhtHashB64;
 
-  @state() private _itemLinks: ItemLink[];
+  @state() private _itemLinks: ItemLink[] = [];
 
 
-  @state() private _zomes: ZomeName[];
-  @state() private _selectedZomeLinks: ScopedZomeTypes;
-  @state() private _linkTypes: ScopedZomeTypes;
-  @state() private _linkTypeFilter: number;
+  @state() private _zomes: ZomeName[] = [];
+  @state() private _selectedZomeLinks: ScopedZomeTypes = [];
+  @state() private _linkTypes: ScopedZomeTypes = [];
+  @state() private _linkTypeFilter?: number;
 
 
   /** */
@@ -56,7 +54,7 @@ export class LinkList extends ZomeElement<ThreadsPerspective, ThreadsZvm> {
 
 
   /** */
-  protected async zvmUpdated(newZvm: ThreadsZvm, oldZvm?: ThreadsZvm): Promise<void> {
+  protected async zvmUpdated(newZvm: PathExplorerZvm, oldZvm?: PathExplorerZvm): Promise<void> {
     console.log("<link-list>.zvmUpdated()", this.rootHash);
     const zi = await newZvm.zomeProxy.zomeInfo();
     console.log({zi});
@@ -68,7 +66,7 @@ export class LinkList extends ZomeElement<ThreadsPerspective, ThreadsZvm> {
 
   /** */
   renderLinkTree(): TemplateResult<1> {
-    const linkKeys = Object.keys(ThreadsLinkTypeType);
+    const linkKeys = [""]; // FIXME: Object.keys(ThreadsLinkTypeType);
     if (!this._itemLinks) {
       return html`No root set`
     }

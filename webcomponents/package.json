@@ -23,8 +23,12 @@
     "@holochain-open-dev/core-types": "0.6.3",
     "@holochain/client": "=0.14.1",
     "@lit-labs/context": "0.2.0",
-    "@shoelace-style/shoelace": "2.6.0",
+    "@ui5/webcomponents": "=1.13.3",
+    "@ui5/webcomponents-fiori": "=1.13.3",
+    "@ui5/webcomponents-icons": "=1.13.3",
+    "@shoelace-style/shoelace": "2.4.0",
     "cqfill": "0.6.0",
+    "js-base64": "^3.7.3",
     "lit": "2.6.0"
   }
 }
