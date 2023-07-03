@@ -2,7 +2,6 @@ use hdk::prelude::*;
 #[allow(unused_imports)]
 use tasker_model::*;
 
-use crate::init_membranes::*;
 use std::collections::BTreeSet;
 
 /// Setup initial capabilities
@@ -42,7 +41,6 @@ fn init(_: ()) -> ExternResult<InitCallbackResult> {
 fn init_inner() -> ExternResult<InitCallbackResult> {
    init_caps(())?;
    init_anchors(())?;
-   init_membranes(())?;
    Ok(InitCallbackResult::Pass)
 }
 

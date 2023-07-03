@@ -7,13 +7,11 @@
 
 mod get;
 mod basic_callbacks;
-mod init_membranes;
 
 #[macro_use]
 extern crate zome_utils;
 
 mod basic_functions;
-mod membraned_functions;
 
 use hdk::prelude::*;
 use zome_utils::call_self_cell;
