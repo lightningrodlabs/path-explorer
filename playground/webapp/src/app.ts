@@ -6,7 +6,7 @@ import {
 } from "@ddd-qc/lit-happ";
 import {TaskerPage} from "./elements/tasker-page";
 import {AgentDirectoryList} from "@ddd-qc/agent-directory";
-import "@path-explorer/elements";
+import "@ddd-qc/path-explorer";
 import { TaskerDvm } from "./viewModel/tasker.dvm";
 import {ProfileDef} from "./viewModel/profiles.proxy";
 

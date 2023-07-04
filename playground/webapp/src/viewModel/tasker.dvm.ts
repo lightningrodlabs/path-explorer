@@ -1,8 +1,8 @@
-import { DnaViewModel, ZvmDef } from "@ddd-qc/lit-happ";
-import {TaskerZvm} from "./tasker.zvm"
-import {AgentDirectoryZvm} from "@ddd-qc/agent-directory"
 import {AppSignalCb} from "@holochain/client";
-import {PathExplorerZvm} from "@path-explorer/elements/dist/viewModels/path-explorer.zvm";
+import { DnaViewModel, ZvmDef } from "@ddd-qc/lit-happ";
+import {AgentDirectoryZvm} from "@ddd-qc/agent-directory"
+import {PathExplorerZvm} from "@ddd-qc/path-explorer/dist/viewModels/path-explorer.zvm";
+import {TaskerZvm} from "./tasker.zvm"
 import {ProfilesZvm} from "./profiles.zvm";
 import {ProfileDef} from "./profiles.proxy";
 

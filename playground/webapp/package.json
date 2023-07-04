@@ -33,13 +33,13 @@
     "typescript": "^4.9.0"
   },
   "dependencies": {
+    "@holochain/client": "=0.14.1",
+    "@holochain-open-dev/core-types": "^0.6.3",
     "@ddd-qc/lit-happ": "0.19.0",
     "@ddd-qc/cell-proxy": "0.19.0",
-    "@holochain/client": "=0.14.1",
     "@ddd-qc/agent-directory": "6.0.0",
-    "@holochain-open-dev/core-types": "^0.6.3",
+    "@ddd-qc/path-explorer": "file:../../webcomponents",
     "@lit-labs/context": "0.2.0",
-    "@path-explorer/elements": "file:../../webcomponents",
     "lit": "2.6.0"
   }
 }

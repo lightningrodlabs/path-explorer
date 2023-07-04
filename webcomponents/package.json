@@ -1,15 +1,29 @@
 {
-  "name": "@path-explorer/elements",
+  "name": "@ddd-qc/path-explorer",
   "version": "0.1.0",
+  "description": "lit-happ elements for browsing Paths & Links.",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "typings": "./dist/index.d.ts",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc --watch --preserveWatchOutput",
     "analyze": "lit-analyzer src --failFast"
   },
-  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lightningrodlabs/path-explorer.git"
+  },
+  "author": "",
+  "license": "CAL-1.0",
+  "bugs": {
+    "url": "https://github.com/lightningrodlabs/path-explorer/issues"
+  },
+  "homepage": "https://github.com/lightningrodlabs/path-explorer#readme",
   "devDependencies": {
     "@types/ws": "^8.5.3",
     "lit-analyzer": "^1.2.1",
