@@ -1,4 +1,4 @@
-import {HoloHashB64} from "@holochain/client";
+import {HoloHashB64, ZomeName} from "@holochain/client";
 import {ItemLink} from "./bindings/deps.types";
 
 export declare type AnyLinkableHashB64 = HoloHashB64;
@@ -8,9 +8,16 @@ export interface FlatScopedLinkType {
   linkIndex: number,
 }
 
+
 /** */
 export function linkType2str(slt: FlatScopedLinkType): string {
   return "[" + slt.zomeIndex + ":" + slt.linkIndex + "]";
+}
+
+
+/** */
+export function linkType2NamedStr(slt: FlatScopedLinkType, zomeNames: ZomeName[]): string {
+  return zomeNames[slt.zomeIndex] + " | " + slt.linkIndex;
 }
 
 

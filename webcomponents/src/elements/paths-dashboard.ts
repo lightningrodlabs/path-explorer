@@ -24,12 +24,15 @@ export class PathsDashboard extends ZomeElement<unknown, PathExplorerZvm> {
   @state() private _selectedHash: AnyLinkableHashB64 = '';
 
 
+  private _agentKeyEntryHash?: AnyLinkableHashB64;
+
   /** -- Methods -- */
 
   /** */
-  protected async zvmUpdated(newDvm: PathExplorerZvm, oldDvm?: PathExplorerZvm): Promise<void> {
+  protected async zvmUpdated(newZvm: PathExplorerZvm, oldZvm?: PathExplorerZvm): Promise<void> {
     console.log("<paths-dashboard>.zvmUpdated()");
     this._selectedHash = '';
+    this._agentKeyEntryHash = encodeHashToBase64(await newZvm.zomeProxy.getAgentEntryHash());
     this._initialized = true;
   }
 
@@ -96,7 +99,7 @@ export class PathsDashboard extends ZomeElement<unknown, PathExplorerZvm> {
             }">Scan latest items
             </button>
             <h1>Paths Dashboard</h1>
-            <h5>Agent: ${this.cell.agentPubKey}</h5>
+            <!-- <h4>Agent entry hash: ${this._agentKeyEntryHash}</h4> -->
         </div>
         <!-- Anchor trees -->
         <div style="display: flex; flex-direction: row;margin-top:25px;">

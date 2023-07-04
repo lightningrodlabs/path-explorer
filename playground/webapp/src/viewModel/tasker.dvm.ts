@@ -41,13 +41,13 @@ import {ProfileDef} from "./profiles.proxy";
 
   /** -- */
 
-  protected async dvmUpdated(newDvm: TaskerDvm, oldDvm?: TaskerDvm): Promise<void> {
-   const dummyProfile: ProfileDef = {
-     nickname: "camille",
-     fields: {},
-   }
-   console.log("taskerDvm.dvmUpdated()", dummyProfile);
-   newDvm.profilesZvm.createMyProfile(dummyProfile);
-  }
+  // protected async dvmUpdated(newDvm: TaskerDvm, oldDvm?: TaskerDvm): Promise<void> {
+  //  const dummyProfile: ProfileDef = {
+  //    nickname: "camille",
+  //    fields: {},
+  //  }
+  //  console.log("taskerDvm.dvmUpdated()", dummyProfile);
+  //  newDvm.profilesZvm.createMyProfile(dummyProfile);
+  // }
 
 }

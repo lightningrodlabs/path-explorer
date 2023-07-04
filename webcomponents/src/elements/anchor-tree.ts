@@ -1,7 +1,7 @@
 import {css, html, PropertyValues, TemplateResult} from "lit";
 import {property, state, customElement} from "lit/decorators.js";
-import {Cell, ZomeElement} from "@ddd-qc/lit-happ";
-import {AnyDhtHashB64, encodeHashToBase64} from "@holochain/client";
+import {Cell, ScopedZomeTypes, ZomeElement} from "@ddd-qc/lit-happ";
+import {AnyDhtHashB64, encodeHashToBase64, ZomeName} from "@holochain/client";
 
 
 import Tree from "@ui5/webcomponents/dist/Tree"
@@ -19,7 +19,7 @@ import "@ui5/webcomponents/dist/features/InputSuggestions.js";
 import {Base64} from "js-base64";
 import {PathExplorerZvm} from "../viewModels/path-explorer.zvm";
 import {TypedAnchor} from "../bindings/path-explorer.types";
-import {AnyLinkableHashB64, FlatScopedLinkType, linkType2str} from "../utils";
+import {AnyLinkableHashB64, FlatScopedLinkType, linkType2NamedStr, linkType2str} from "../utils";
 
 
 const ZOME_LINK_NAMES = [""]; // FIXME Get Link names somehow once Holo provides an API for that ; Object.keys(ThreadsLinkTypeType);
@@ -57,20 +57,6 @@ function toLinkTreeItem(ti: TreeItem) {
 }
 
 
-/** */
-function toRootTreeItem(lti: LinkTreeItem): TemplateResult {
-  //console.log("toRootTreeItem()", lti)
-  if (lti.slt == undefined) {
-    console.warn("toRootTreeItem() aborted. Missing linkIndex argument.");
-    return html``;
-  }
-  const id = "anchor__" +  lti.origin;
-  const linkTypeName = linkType2str(lti.slt);
-  return html`<ui5-tree-item id="${id}" text="${lti.origin}" additional-text=${linkTypeName} has-children
-                             origin="${lti.origin}" zomeIndex="${lti.slt.zomeIndex}" linkIndex="${lti.slt.linkIndex}"></ui5-tree-item>`
-}
-
-
 /**
  * Element for displaying a tree of Links
  * An AnchorTree is a tree of all Paths using the same link-type
@@ -89,9 +75,12 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
   }
 
 
-  @property() root: AnyDhtHashB64 | TypedAnchor | undefined = undefined
+  @property() rootTypedAnchor: TypedAnchor | undefined = undefined
 
   @state() private _level0: LinkTreeItem[] = [];
+
+  @state() private _linkTypes: ScopedZomeTypes = [];
+  @state() private _zomeNames: ZomeName[] = [];
 
   //@state() private _isTyped = true;
 
@@ -101,6 +90,17 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
 
   // TODO: Implement ExpandAll button
   // TODO: Add refresh buttons to branch items
+
+
+  /** */
+  protected async zvmUpdated(newZvm: PathExplorerZvm, oldZvm?: PathExplorerZvm): Promise<void> {
+    const zi = await newZvm.zomeProxy.zomeInfo();
+    //console.log({zi});
+    this._linkTypes = zi.zome_types.links;
+    const di = await newZvm.zomeProxy.dnaInfo();
+    this._zomeNames = di.zome_names;
+  }
+
 
   /** */
   renderLeafAnchor(rootAnchors: TypedAnchor[]): TemplateResult<1> {
@@ -115,7 +115,7 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
 
   /** Probe rootAnchors at startup */
   protected firstUpdated() {
-    this.probeRootAnchors();
+    this.walkRootAnchor();
   }
 
 
@@ -130,58 +130,66 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
   shouldUpdate(changedProperties: PropertyValues<this>) {
     super.shouldUpdate(changedProperties);
     //console.log("<anchor-tree>.shouldUpdate()", changedProperties);
-    if (changedProperties.has("root")) {
-      //console.log("<anchor-tree>.shouldUpdate()", changedProperties);
-      this.probeRootAnchors();
+    if (changedProperties.has("rootTypedAnchor")) {
+      console.log("<anchor-tree>.shouldUpdate()", changedProperties);
+      this.walkRootAnchor();
     }
     return true;
   }
 
+
+  /** */
+  toRootTreeItem(lti: LinkTreeItem): TemplateResult {
+    //console.log("toRootTreeItem()", lti)
+    if (lti.slt == undefined) {
+      console.warn("toRootTreeItem() aborted. Missing linkIndex argument.");
+      return html``;
+    }
+    const id = "anchor__" +  lti.origin;
+    const linkTypeName = linkType2NamedStr(lti.slt, this._zomeNames) //linkType2str(lti.slt);
+    return html`<ui5-tree-item id="${id}" text="${lti.origin}" additional-text=${linkTypeName} has-children
+                             origin="${lti.origin}" zomeIndex="${lti.slt.zomeIndex}" linkIndex="${lti.slt.linkIndex}"></ui5-tree-item>`
+  }
+
+
   /** Set _rootAnchors to all anchors linking off ROOT */
-  async probeRootAnchors(): Promise<void> {
+  async walkRootAnchor(): Promise<void> {
     if (!this._zvm) {
       return;
     }
-    const maybeTree = this.shadowRoot!.getElementById("rootAnchorTree") as Tree;
-    console.debug("probeRootAnchors()", maybeTree);
-    if (maybeTree) {
-      //maybeTree.innerHTML = '';
-      // while (maybeTree.firstChild) {
-      //   maybeTree.removeChild(maybeTree.firstChild);
-      // }
-    }
-    if (this.root) {
-      if (typeof this.root == 'string') {
-        const b64 = new TextEncoder().encode(this.root);
-        console.log("root to b64", this.root, b64);
-        const itemLinks = await this._zvm.zomeProxy.getAllItemsFromB64(b64);
-        this._level0 = itemLinks.map((il) => {return {origin: encodeHashToBase64(il.itemHash), zomeIndex: il.zomeIndex, linkIndex: il.linkIndex}});
-      } else {
-        /** AnchorTree */
-        const tas = await this._zvm.zomeProxy.getTypedChildren(this.root);
-        this._level0 = tas.map((ta) => {return {origin: ta.anchor, zomeIndex: ta.zomeIndex, linkIndex: ta.linkIndex}});
-
-      }
+    console.debug("walkRootAnchor()", this.rootTypedAnchor);
+    // const maybeTree = this.shadowRoot!.getElementById("rootAnchorTree") as Tree;
+    // console.debug("walkAnchor()", maybeTree);
+    // if (maybeTree) {
+    //   maybeTree.innerHTML = '';
+    //   while (maybeTree.firstChild) {
+    //     maybeTree.removeChild(maybeTree.firstChild);
+    //   }
+    // }
+    let tas: TypedAnchor[] = [];
+    if (this.rootTypedAnchor) {
+        tas = await this._zvm.zomeProxy.getTypedChildren(this.rootTypedAnchor);
     } else {
       /** AnchorTree from ROOT */
-      let tas = await this._zvm.zomeProxy.getAllRootAnchors();
-      console.log("TypedAnchors", tas);
-      this._level0 = tas.map((ta) => {
-        return {origin: ta.anchor, slt: {zomeIndex: ta.zomeIndex, linkIndex: ta.linkIndex}}
-      });
+      tas = await this._zvm.zomeProxy.getAllRootAnchors();
     }
+    console.log("TypedAnchors", tas);
+    this._level0 = tas.map((ta): LinkTreeItem => {
+      return {origin: ta.anchor, slt: {zomeIndex: ta.zomeIndex, linkIndex: ta.linkIndex}}
+    });
   }
 
 
   /** */
-  renderAnchorTree(): TemplateResult<1> {
-    const level0Items = this._level0.map((lti) => {return toRootTreeItem(lti)});
+  renderAnchorTree(title: string): TemplateResult<1> {
+    const level0Items = this._level0.map((lti) => {return this.toRootTreeItem(lti)});
     //console.log({level0: level0Items});
 
     /** */
     return html`
       <ui5-busy-indicator id="busy" style="width: 100%">
-        <ui5-tree id="rootAnchorTree" mode="None" no-data-text="No links found"
+        <ui5-tree id="rootAnchorTree" mode="None" no-data-text="No (sub)anchors found"
+                  header-text=${title}
                   @item-toggle="${this.toggleTreeItem}"
                   @click="${this.clickTree}"
         >
@@ -311,29 +319,32 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
   render() {
     //console.log("<anchor-tree>.render()", this.root);
 
-    let title = "Tree of all Paths from ROOT in cell " + this.cell.name
-    if (this.root) {
-      if (typeof this.root == 'string') {
-        title = `Tree of Paths from ${this.root} in cell "${this.cell.name}"`
+    let title = "Viewing ROOT";
+    if (this.rootTypedAnchor) {
+      if (typeof this.rootTypedAnchor == 'string') {
+        title = `Viewing "${this.rootTypedAnchor}"`
       } else {
-        title = "AnchorTree from " + this.root.anchor
+        title = `Viewing "${this.rootTypedAnchor.anchor}"`
       }
     };
     /** render all */
     return html`
-        <h3>${title}</h3>
-          <button @click=${this.onScanRoot}>
-              Scan ROOT
-          </button>
+        <h2>
+            Anchor Explorer: cell "${this.cell.name}"
+            <button @click=${this.onProbeROOT}>
+                Probe ROOT
+            </button>
+        </h2>
+        <!--<h4>${title}</h4>-->
           <button style="display: none;" @click="${async () => {await this.expandAll();}}">
               Expand All
           </button>
-          <ui5-input id="rootInput" type="Text" placeholder="root hash or path"
+          <ui5-input id="rootInput" type="Text" placeholder="root anchor"
                      show-clear-icon
                      style="min-width: 400px;"></ui5-input>            
-          <button @click=${this.onWalk}>Walk</button>
+          <button @click=${this.onWalkInput}>Walk</button>
         <div>
-          ${this.renderAnchorTree()}
+          ${this.renderAnchorTree(title)}
         </div>
     `;
 
@@ -341,33 +352,27 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
 
 
   /** */
-  async onScanRoot(e:any) {
-    this.root = undefined ;
-    await this.probeRootAnchors();
+  async onProbeROOT(e:any) {
+    this.rootTypedAnchor = undefined ;
+    await this.walkRootAnchor();
     const input = this.shadowRoot!.getElementById("rootInput") as Input;
     input.value = '';
   }
 
 
   /** */
-  async onWalk(e:any) {
+  async onWalkInput(e:any) {
     const input = this.shadowRoot!.getElementById("rootInput") as Input;
     if (!input.value) {
-      this.root = undefined;
+      this.rootTypedAnchor = undefined;
       return;
     }
-    const isHash = Base64.isValid(input.value) &&  input.value.substring(0, 3) == "uhC"
-    console.log("onWalk()", input.value, isHash)
-    if (isHash) {
-       this.root = input.value;
-    } else {
-      const maybeTypedAnchor = await this._zvm.zomeProxy.getTypedAnchor(input.value);
-      console.log("onWalk()", maybeTypedAnchor)
-      if (maybeTypedAnchor[1]) {
-        this.root = maybeTypedAnchor[1];
-      } else {
-        this.root = maybeTypedAnchor[0] as AnyDhtHashB64;
-      }
+    //const isHash = Base64.isValid(input.value) &&  input.value.substring(0, 3) == "uhC"
+    //console.log("onWalk()", input.value, isHash)
+    const maybeTypedAnchor = await this._zvm.zomeProxy.getTypedAnchor(input.value);
+    console.log("onWalkInput()", maybeTypedAnchor)
+    if (maybeTypedAnchor[1]) {
+      this.rootTypedAnchor = maybeTypedAnchor[1];
     }
   }
 }

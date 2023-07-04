@@ -178,4 +178,8 @@ export class PathExplorerProxy extends ZomeProxy {
   }
 
 
+
+  async getAgentEntryHash(): Promise<Uint8Array> {
+    return this.call('get_agent_entry_hash', null);
+  }
 }

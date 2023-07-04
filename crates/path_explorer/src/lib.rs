@@ -31,6 +31,12 @@ fn get_dna_info(_:()) -> ExternResult<DnaInfo> {
 }
 
 
+#[hdk_extern]
+fn get_agent_entry_hash(_:()) -> ExternResult<AnyLinkableHash> {
+  Ok(AnyLinkableHash::from(EntryHash::from(agent_info()?.agent_latest_pubkey)))
+}
+
+
 /// Only gives values for current integrity zome.
 /// Hopefully Holo will fix this and give all links types for all zomes in the dna.
 pub fn dna_link_types() -> Vec<(ZomeIndex, Vec<LinkType>)> {

@@ -2,6 +2,7 @@ use hdk::hash_path::path::Component;
 use hdk::prelude::*;
 use hdk::prelude::holo_hash::EntryHashB64;
 use crate::*;
+use crate::fns::get_all_root_anchors;
 
 /// Determine TypedAnchor from anchor, by looking for parent
 /// Return EntryHash of anchor if no parents found
@@ -10,6 +11,8 @@ pub fn get_typed_anchor(anchor: String) -> ExternResult<(EntryHashB64, Option<Ty
   let path = Path::from(anchor.clone());
   let path_eh = path.path_entry_hash()?;
   let path_hash = AnyLinkableHash::from(path_eh.clone());
+
+  debug!("path_eh: {}", path_eh);
 
   /// Determine parent_path
   let maybe_parent_path = if path.as_ref().len() > 1 {
@@ -20,9 +23,12 @@ pub fn get_typed_anchor(anchor: String) -> ExternResult<(EntryHashB64, Option<Ty
     None
   };
 
-  /// Check for parent's children and match which zfn argument to get link info
+  debug!("maybe_parent_path: {:?}", maybe_parent_path);
+
+  /// Check for parent's children and match which fn argument to get link info
   if let Some(parent_path) = maybe_parent_path {
     let child_links = get_any_children(parent_path, None)?;
+    debug!("child_links: {:?}", child_links);
     for link in child_links {
       if link.target == path_hash {
         let ta = TypedAnchor {
@@ -33,6 +39,16 @@ pub fn get_typed_anchor(anchor: String) -> ExternResult<(EntryHashB64, Option<Ty
         return Ok((path_eh.into(), Some(ta)));
       }
     }
+    debug!("no match found");
+  } else {
+    let root_anchors = get_all_root_anchors(())?;
+    debug!("root_anchors: {:?}", root_anchors);
+    for root_anchor in root_anchors {
+      if root_anchor.anchor == anchor {
+        return Ok((path_eh.into(), Some(root_anchor)));
+      }
+    }
+    debug!("no match found (2)");
   }
 
   /// Done

@@ -8,7 +8,7 @@ import "@ui5/webcomponents/dist/Tree.js"
 import "@ui5/webcomponents/dist/TreeItem.js";
 import "@ui5/webcomponents/dist/BusyIndicator.js";
 import {PathExplorerZvm} from "../viewModels/path-explorer.zvm";
-import {linkType2str, utf32Decode} from "../utils";
+import {linkType2NamedStr, linkType2str, utf32Decode} from "../utils";
 
 
 /**
@@ -26,9 +26,9 @@ export class LinkList extends ZomeElement<unknown, PathExplorerZvm> {
   @property() base?: AnyDhtHashB64;
 
   @state() private _itemLinks: ItemLink[] = [];
-  @state() private _zomes: ZomeName[] = [];
-  @state() private _selectedZomeLinks: ScopedZomeTypes = [];
   @state() private _linkTypes: ScopedZomeTypes = [];
+  @state() private _zomeNames: ZomeName[] = [];
+  @state() private _selectedZomeLinks: ScopedZomeTypes = [];
   @state() private _linkTypeFilter?: number;
 
 
@@ -62,7 +62,7 @@ export class LinkList extends ZomeElement<unknown, PathExplorerZvm> {
     console.log({zi});
     this._linkTypes = zi.zome_types.links;
     const di = await newZvm.zomeProxy.dnaInfo();
-    this._zomes = di.zome_names;
+    this._zomeNames = di.zome_names;
   }
 
 
@@ -84,16 +84,16 @@ export class LinkList extends ZomeElement<unknown, PathExplorerZvm> {
           tag = new TextDecoder().decode(new Uint8Array(ll.tag));
         }
         const hash = encodeHashToBase64(new Uint8Array(ll.itemHash));
-        const linkTypeStr = linkType2str(ll);
+        const linkTypeStr = linkType2NamedStr(ll, this._zomeNames); // linkType2str(ll);
         const additionalText = tag? linkTypeStr + " | " + tag : linkTypeStr;
         return html`<ui5-tree-item id="${hash}" text="${hash}" additional-text="${additionalText}"></ui5-tree-item>`
       });
     console.log({children})
-    const header = "Viewing: " + this.base? this.base : "<none>";
+    const header = `Viewing ${this.base? this.base : "none"}`;
 
     return html`
       <ui5-busy-indicator id="busy" style="width: 100%">
-        <ui5-tree id="linkTree" mode="None" header-text="${header}" no-data-text="No links found">
+        <ui5-tree id="linkTree" header-text=${header} no-data-text="No links found">
           ${children}
         </ui5-tree>
       </ui5-busy-indicator>
@@ -131,7 +131,7 @@ export class LinkList extends ZomeElement<unknown, PathExplorerZvm> {
   /** */
   render() {
     //console.log(`<link-list> render(): ${this.rootHash}`);
-    if (!this._zomes) {
+    if (!this._zomeNames) {
       return html`Loading...`;
     }
 
@@ -145,13 +145,13 @@ export class LinkList extends ZomeElement<unknown, PathExplorerZvm> {
               Filter by
             <span>zome:</span>
             <select name="zomeSelector" id="zomeSelector" @click=${this.onZomeSelect}>
-                ${Object.values(this._zomes).map(
+                ${Object.values(this._zomeNames).map(
                         (zomeName) => {
                             return html`<option>${zomeName}</option>`
                         }
                 )}
             </select>
-            <span> link type:</span>
+            <span>, link type:</span>
             <select name="linkTypeSelector" id="linkTypeSelector" @click=${this.onLinkTypeSelect}>
                 ${this._linkTypes.length > 0? this._linkTypes[0].map(
                         (linkIndex) => {

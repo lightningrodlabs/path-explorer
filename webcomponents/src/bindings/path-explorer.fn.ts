@@ -17,7 +17,8 @@ export const pathExplorerFunctionNames: FunctionName[] = [
 	"get_typed_anchor",
 	"get_typed_children",
 
-];
+
+	"get_agent_entry_hash",];
 
 
 /** Generate tuple array of function names with given zomeName */

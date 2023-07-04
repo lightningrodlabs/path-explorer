@@ -8,6 +8,7 @@ import {TaskerPage} from "./elements/tasker-page";
 import {AgentDirectoryList} from "@ddd-qc/agent-directory";
 import "@path-explorer/elements";
 import { TaskerDvm } from "./viewModel/tasker.dvm";
+import {ProfileDef} from "./viewModel/profiles.proxy";
 
 
 
@@ -63,6 +64,14 @@ export class TaskerApp extends HappElement {
     await this.hvm.probeAll();
     this._allAppEntryTypes = await this.taskerDvm.fetchAllEntryDefs();
     console.log("happInitialized(), _allAppEntryTypes", this._allAppEntryTypes);
+
+    const dummyProfile: ProfileDef = {
+      nickname: "camille",
+      fields: {},
+    }
+    console.log("taskerDvm.createMyProfile()", dummyProfile);
+    this.taskerDvm.profilesZvm.createMyProfile(dummyProfile);
+
     /** Done */
     this._loaded = true;
   }
