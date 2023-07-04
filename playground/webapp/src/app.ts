@@ -1,13 +1,15 @@
 import { html } from "lit";
 import {property, state} from "lit/decorators.js";
+import {AdminWebsocket, AgentPubKeyB64, DnaDefinition, RoleName} from "@holochain/client";
+import {
+  HvmDef, HappElement, HCL, delay, Cell
+} from "@ddd-qc/lit-happ";
 import {TaskerPage} from "./elements/tasker-page";
 import {AgentDirectoryList} from "@ddd-qc/agent-directory";
-import {PathsDashboard} from "@path-explorer/elements";
+import "@path-explorer/elements";
 import { TaskerDvm } from "./viewModel/tasker.dvm";
-import {
-  HvmDef, HappElement, HCL, ViewCellContext, CellDef, CellContext, delay, Cell
-} from "@ddd-qc/lit-happ";
-import {AdminWebsocket, AgentPubKeyB64, DnaDefinition, RoleName} from "@holochain/client";
+
+
 
 
 /**

@@ -145,20 +145,24 @@ export class PathExplorerProxy extends ZomeProxy {
   static readonly DEFAULT_ZOME_NAME = "path-explorer"
   static readonly FN_NAMES = pathExplorerFunctionNames
  
-  async getAllRootAnchors(zomeName: string): Promise<TypedAnchor[]> {
-    return this.call('get_all_root_anchors', zomeName);
+  async getAllItemsFromAnchor(leafAnchor: string): Promise<ItemLink[]> {
+    return this.call('get_all_items_from_anchor', leafAnchor);
   }
 
-  async getItems(input: GetItemsInput): Promise<ItemLink[]> {
-    return this.call('get_items', input);
-  }
-
-  async getAllItems(leafAnchor: string): Promise<ItemLink[]> {
-    return this.call('get_all_items', leafAnchor);
+  async getAllItems(hash: Uint8Array): Promise<ItemLink[]> {
+    return this.call('get_all_items', hash);
   }
 
   async getAllItemsFromB64(b64: Uint8Array): Promise<ItemLink[]> {
     return this.call('get_all_items_from_b64', b64);
+  }
+
+  async getAllRootAnchors(): Promise<TypedAnchor[]> {
+    return this.call('get_all_root_anchors', null);
+  }
+
+  async getItems(input: GetItemsInput): Promise<ItemLink[]> {
+    return this.call('get_items', input);
   }
 
   async getLeafAnchors(ta: TypedAnchor): Promise<TypedAnchor[]> {
@@ -172,4 +176,6 @@ export class PathExplorerProxy extends ZomeProxy {
   async getTypedChildren(parentTa: TypedAnchor): Promise<TypedAnchor[]> {
     return this.call('get_typed_children', parentTa);
   }
+
+
 }

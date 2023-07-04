@@ -1,7 +1,7 @@
 import {css, html, PropertyValues, TemplateResult} from "lit";
 import {property, state, customElement} from "lit/decorators.js";
 import {ScopedZomeTypes, ZomeElement} from "@ddd-qc/lit-happ";
-import {AnyDhtHashB64, encodeHashToBase64, ZomeName} from "@holochain/client";
+import {AnyDhtHashB64, decodeHashFromBase64, encodeHashToBase64, ZomeName} from "@holochain/client";
 import {ItemLink} from '../bindings/deps.types';
 
 import "@ui5/webcomponents/dist/Tree.js"
@@ -12,7 +12,7 @@ import {utf32Decode} from "../utils";
 
 
 /**
- * @element
+ *
  */
 @customElement("link-list")
 export class LinkList extends ZomeElement<unknown, PathExplorerZvm> {
@@ -26,8 +26,6 @@ export class LinkList extends ZomeElement<unknown, PathExplorerZvm> {
   @property() rootHash?: AnyDhtHashB64;
 
   @state() private _itemLinks: ItemLink[] = [];
-
-
   @state() private _zomes: ZomeName[] = [];
   @state() private _selectedZomeLinks: ScopedZomeTypes = [];
   @state() private _linkTypes: ScopedZomeTypes = [];
@@ -37,8 +35,12 @@ export class LinkList extends ZomeElement<unknown, PathExplorerZvm> {
   /** */
   async scanRoot() {
     console.log("<link-list>.scanRoot()", this.rootHash);
-    const b64 = new TextEncoder().encode(this.rootHash);
-    this._itemLinks = await this._zvm.zomeProxy.getAllItemsFromB64(b64);
+    //const b64 = new TextEncoder().encode(this.rootHash);
+    if (!this.rootHash) {
+      return;
+    }
+    const rootHash = decodeHashFromBase64(this.rootHash);
+    this._itemLinks = await this._zvm.zomeProxy.getAllItems(rootHash);
   }
 
 
@@ -87,10 +89,11 @@ export class LinkList extends ZomeElement<unknown, PathExplorerZvm> {
         return html`<ui5-tree-item id="${hash}" text="${hash}" additional-text="${additionalText}"></ui5-tree-item>`
       });
     console.log({children})
-    const header = "Root: " + this.rootHash;
+    const header = "Viewing: " + this.rootHash? this.rootHash : "<none>";
+
     return html`
       <ui5-busy-indicator id="busy" style="width: 100%">
-        <ui5-tree id="linkTree" mode="None" header-text="${header}" no-data-text="No links found">
+        <ui5-tree id="linkTree" mode="None" .header-text="${header}" no-data-text="No links found">
           ${children}
         </ui5-tree>
       </ui5-busy-indicator>
@@ -118,6 +121,12 @@ export class LinkList extends ZomeElement<unknown, PathExplorerZvm> {
   }
 
 
+  /** */
+  onProbe(e:any) {
+    const input = this.shadowRoot!.getElementById("baseInput") as HTMLInputElement;
+    this.rootHash = input.value;
+  }
+
 
   /** */
   render() {
@@ -128,9 +137,13 @@ export class LinkList extends ZomeElement<unknown, PathExplorerZvm> {
 
     /** render all */
     return html`
-        <div style="background: darkseagreen; padding-bottom: 5px">
-          <h3>Link Tree component</h3>
-            Filter by:
+        <h3>Link Tree</h3>
+          <label for="baseInput">Base:</label>
+          <input style="min-width: 400px;" type="text" id="baseInput" name="title">
+          <input type="button" value="Probe" @click=${this.onProbe}>
+          <div style="margin-top:5px;">
+              Filter by
+            <span>zome:</span>
             <select name="zomeSelector" id="zomeSelector" @click=${this.onZomeSelect}>
                 ${Object.values(this._zomes).map(
                         (zomeName) => {
@@ -138,17 +151,18 @@ export class LinkList extends ZomeElement<unknown, PathExplorerZvm> {
                         }
                 )}
             </select>
+            <span> link type:</span>
             <select name="linkTypeSelector" id="linkTypeSelector" @click=${this.onLinkTypeSelect}>
-                ${this._linkTypes[0].map(
+                ${this._linkTypes.length > 0? this._linkTypes[0].map(
                         (linkIndex) => {
                             return html`<option>${linkIndex}</option>`
                         }
-                )}
+                ): html``}
             </select>
             <button @click="${() => {this._linkTypeFilter = undefined;}}">Reset</button>
-            <div>
-            ${this.renderLinkTree()}
           </div>
+          <div>
+          ${this.renderLinkTree()}
         </div>
     `;
   }

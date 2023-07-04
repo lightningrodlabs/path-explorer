@@ -1,7 +1,7 @@
 import {css, html, PropertyValues, TemplateResult} from "lit";
 import {property, state, customElement} from "lit/decorators.js";
-import {ZomeElement} from "@ddd-qc/lit-happ";
-import {AnyDhtHashB64, encodeHashToBase64, HoloHashB64} from "@holochain/client";
+import {Cell, ZomeElement} from "@ddd-qc/lit-happ";
+import {AnyDhtHashB64, encodeHashToBase64} from "@holochain/client";
 
 
 import Tree from "@ui5/webcomponents/dist/Tree"
@@ -153,6 +153,7 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
     if (this.root) {
       if (typeof this.root == 'string') {
         const b64 = new TextEncoder().encode(this.root);
+        console.log("root to b64", this.root, b64);
         const itemLinks = await this._zvm.zomeProxy.getAllItemsFromB64(b64);
         this._level0 = itemLinks.map((il) => {return {origin: encodeHashToBase64(il.itemHash), zomeIndex: il.zomeIndex, linkIndex: il.linkIndex}});
       } else {
@@ -163,7 +164,7 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
       }
     } else {
       /** AnchorTree from ROOT */
-      let tas = await this._zvm.zomeProxy.getAllRootAnchors("threads_integrity");
+      let tas = await this._zvm.zomeProxy.getAllRootAnchors();
       this._level0 = tas.map((ta) => {return {origin: ta.anchor, zomeIndex: ta.zomeIndex, linkIndex: ta.linkIndex}});
     }
   }
@@ -232,7 +233,7 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
         any_children_tas = await this._zvm.zomeProxy.getTypedChildren({anchor: lti.origin, zomeIndex: lti.zomeIndex, linkIndex: lti.linkIndex});
       }
       // else {
-      //   let linkItems = await this._zvm.zomeProxy.getAllItems(lti.origin);
+      //   let linkItems = await this._zvm.zomeProxy.getAllItemsFromAnchor(lti.origin);
       //   //any_children_tas = await this._zvm.zomeProxy.getAllChildren(lti.origin);
       //
       // }
@@ -267,7 +268,7 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
         }
 
         const maybeOriginAttribute = toggledTreeItem.getAttribute("origin");
-        const itemLinks = await this._zvm.zomeProxy.getAllItems(maybeOriginAttribute? maybeOriginAttribute : "");
+        const itemLinks = await this._zvm.zomeProxy.getAllItemsFromAnchor(maybeOriginAttribute? maybeOriginAttribute : "");
         console.log({itemLinks})
         for (const itemLink of itemLinks) {
           const tag = new TextDecoder().decode(new Uint8Array(itemLink.tag));
@@ -299,35 +300,37 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
   }
 
 
+  // cellName(cell: Cell): string {
+  //   return `Cell "${cell.name}${this.cloneId? "." + this.cloneId: ""}": ${this.dnaHash}`;
+  // }
+
   /** */
   render() {
     //console.log("<anchor-tree>.render()", this.root);
 
-    let title = "Tree of all Links from ROOT in " + this.cell.print()
+    let title = "Tree of all Paths from ROOT in cell " + this.cell.name
     if (this.root) {
       if (typeof this.root == 'string') {
-        title = `Tree of Links from ${this.root} in ${this.cell.print()}`
+        title = `Tree of Paths from ${this.root} in cell "${this.cell.name}"`
       } else {
         title = "AnchorTree from " + this.root.anchor
       }
     };
     /** render all */
     return html`
-        <div style="background: lightcyan; padding-bottom: 5px">
-          <h3>${title}</h3>
-            <button @click=${this.onScanRoot}>
-                Scan ROOT
-            </button>
-            <button style="display: none;" @click="${async () => {await this.expandAll();}}">
-                Expand All
-            </button>
-            <ui5-input id="rootInput" type="Text" placeholder="root hash or path"
-                       show-clear-icon
-                       style="min-width: 400px;"></ui5-input>            
-            <button @click=${this.onWalk}>Walk</button>
-          <div>
-            ${this.renderAnchorTree()}
-          </div>
+        <h3>${title}</h3>
+          <button @click=${this.onScanRoot}>
+              Scan ROOT
+          </button>
+          <button style="display: none;" @click="${async () => {await this.expandAll();}}">
+              Expand All
+          </button>
+          <ui5-input id="rootInput" type="Text" placeholder="root hash or path"
+                     show-clear-icon
+                     style="min-width: 400px;"></ui5-input>            
+          <button @click=${this.onWalk}>Walk</button>
+        <div>
+          ${this.renderAnchorTree()}
         </div>
     `;
 

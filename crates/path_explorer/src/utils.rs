@@ -12,6 +12,7 @@ pub fn get_zome_index(zome_name: &str) -> u8 {
     i += 1;
   }
   /// Unreachable
-  let err_msg = format!("No zome with name '{}' found in dna_info", zome_name);
+  let err_msg = format!("Panic. No zome with name '{}' found in dna_info", zome_name);
+  debug!(err_msg);
   panic!("{}", err_msg);
 }

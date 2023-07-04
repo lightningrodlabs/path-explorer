@@ -19,6 +19,18 @@ use hdk::prelude::*;
 use zome_utils::*;
 
 
+#[hdk_extern]
+fn get_zome_info(_:()) -> ExternResult<ZomeInfo> {
+  return zome_info();
+}
+
+
+#[hdk_extern]
+fn get_dna_info(_:()) -> ExternResult<DnaInfo> {
+  return dna_info();
+}
+
+
 /// Only gives values for current integrity zome.
 /// Hopefully Holo will fix this and give all links types for all zomes in the dna.
 pub fn dna_link_types() -> Vec<(ZomeIndex, Vec<LinkType>)> {
@@ -30,6 +42,7 @@ pub fn dna_link_types() -> Vec<(ZomeIndex, Vec<LinkType>)> {
 }
 
 
+/// Returns all zome indexes in this DNA
 /// Only gives link_types for current integrity zome.
 /// Hopefully Holo will fix this and return all integrity zomes in the dna.
 pub fn dna_zomes() -> Vec<ZomeIndex> {

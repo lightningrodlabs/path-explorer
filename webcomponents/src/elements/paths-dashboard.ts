@@ -1,7 +1,7 @@
 import {css, html} from "lit";
 import {property, state, customElement} from "lit/decorators.js";
-import {DnaElement, ZomeElement} from "@ddd-qc/lit-happ";
-import {ActionHashB64, decodeHashFromBase64, encodeHashToBase64, EntryHashB64, fakeEntryHash} from "@holochain/client";
+import {ZomeElement} from "@ddd-qc/lit-happ";
+import {encodeHashToBase64} from "@holochain/client";
 import {PathExplorerZvm} from "../viewModels/path-explorer.zvm";
 import {AnyLinkableHashB64} from "../utils";
 import {TypedAnchor} from "../bindings/path-explorer.types";
@@ -9,20 +9,24 @@ import {TypedAnchor} from "../bindings/path-explorer.types";
 const LINK_KEYS = ['']; // FIXME Object.keys(ThreadsLinkTypeType);
 
 /**
- * @element
+ *
  */
 @customElement("paths-dashboard")
 export class PathsDashboard extends ZomeElement<unknown, PathExplorerZvm> {
 
+  constructor() {
+    super(PathExplorerZvm.DEFAULT_ZOME_NAME);
+    console.log("<paths-dashboard>.ctor()");
+  }
 
   /** -- Fields -- */
   @state() private _initialized = false;
   @state() private _selectedHash: AnyLinkableHashB64 = '';
 
 
-
   /** -- Methods -- */
 
+  /** */
   protected async zvmUpdated(newDvm: PathExplorerZvm, oldDvm?: PathExplorerZvm): Promise<void> {
     console.log("<paths-dashboard>.zvmUpdated()");
     this._selectedHash = '';
@@ -30,10 +34,9 @@ export class PathsDashboard extends ZomeElement<unknown, PathExplorerZvm> {
   }
 
 
-
   /** */
   async printRootAnchors() {
-    const rootAnchors = await this._zvm.zomeProxy.getAllRootAnchors("threads_integrity");
+    const rootAnchors = await this._zvm.zomeProxy.getAllRootAnchors();
     console.log({rootAnchors})
     for (const rootAnchor of rootAnchors) {
       //const str = utf32Decode(new Uint8Array(child[1]));
@@ -48,7 +51,7 @@ export class PathsDashboard extends ZomeElement<unknown, PathExplorerZvm> {
     const children = await this._zvm.zomeProxy.getTypedChildren(root_ta);
     //console.log({children})
     if (children.length == 0) {
-      const itemLinks = await this._zvm.zomeProxy.getAllItems(root_ta.anchor);
+      const itemLinks = await this._zvm.zomeProxy.getAllItemsFromAnchor(root_ta.anchor);
       if (itemLinks.length > 0) {
         const tag = new TextDecoder().decode(new Uint8Array(itemLinks[0].tag));
         const leaf = root_ta.anchor + tag
@@ -70,7 +73,7 @@ export class PathsDashboard extends ZomeElement<unknown, PathExplorerZvm> {
 
   /** */
   render() {
-    console.log("<paths-dashboard.render()> render()", this._initialized, this._selectedHash);
+    console.log("<paths-dashboard> render()", this._initialized, this._selectedHash);
     if (!this._initialized) {
       return html`<span>Loading...</span>`;
     }
@@ -79,24 +82,6 @@ export class PathsDashboard extends ZomeElement<unknown, PathExplorerZvm> {
     /** Render all */
     return html`
         <div>
-            <button @click="${async () => {
-                await this.updateComplete;
-                this.dispatchEvent(new CustomEvent('debug', {detail: false, bubbles: true, composed: true}));
-            }}">exit
-            </button>
-            <button @click="${() => {
-                console.log("refresh");
-                //const el = this.shadowRoot.getElementById("test") as ThreadsTestPage;
-                //el.requestUpdate();
-                //this.refresh();
-            }}">refresh
-            </button>
-            <button @click="${async () => {
-                console.log("*** Scan All Semantic Topics:");
-                await this.printChildren({anchor: "all_semantic_topics", linkIndex: 1, zomeIndex: 0});
-            }
-            }">Scan Semantic Topics
-            </button>
             <button @click="${async () => {
                 console.log("*** Scan Root Anchors:");
                 await this.printRootAnchors();
@@ -108,20 +93,17 @@ export class PathsDashboard extends ZomeElement<unknown, PathExplorerZvm> {
                 //let res = await this._zvm.zomeProxy.getLatestItems();
                 //console.log({res})
             }
-            }">Scan latest entries
+            }">Scan latest items
             </button>
-            <h1>Paths Dashboard: ${this.cell.agentPubKey}</h1>
-            <div>
-                <label for="threadInput">Create new thread:</label>
-                <input type="text" id="threadInput" name="purpose">
-            </div>
+            <h1>Paths Dashboard</h1>
+            <h5>Agent: ${this.cell.agentPubKey}</h5>
         </div>
         <!-- Anchor trees -->
         <div style="display: flex; flex-direction: row;margin-top:25px;">
-            <anchor-tree style="width: 50%; overflow: auto;"
+            <anchor-tree style="width:50%; overflow:auto; background:lightcyan; padding-bottom:5px"
                          @hashSelected="${(e:any) => {this._selectedHash = e.detail}}"></anchor-tree>
             <link-list .rootHash="${this._selectedHash}"
-                       style="width: 50%; overflow: auto;"></link-list>
+                       style="width:50%; overflow:auto; background:azure; padding-bottom:5px;"></link-list>
         </div>
     `;
   }

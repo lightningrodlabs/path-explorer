@@ -21,7 +21,7 @@
     "build:bindings"         : "bash scripts/ts-bindings.sh",
     "build:webcomponents"    : "npm run build -w @path-explorer/elements",
     "build:playground"       : "npm run build -w playground/webapp",
-    "build:all"              : "npm run clean:hc & npm run build:happ && npm run build:webcomponents && npm run build:playground",
+    "build:all"              : "npm run clean:hc & npm run build:happ && npm run build:bindings && npm run build:webcomponents && npm run build:playground",
 
     "devtest"                : "npm run build:all && concurrently \"npm run build:watch -w webcomponents\" \"npm run build:watch -w playground/webapp\" \"npm run start\"",
     "watch:webcomponents"    : "npm run build:watch -w webcomponents",

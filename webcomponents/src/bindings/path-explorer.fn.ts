@@ -8,13 +8,16 @@ export const pathExplorerFunctionNames: FunctionName[] = [
 	"entry_defs", 
 	"get_zome_info", 
 	"get_dna_info",
-	"get_all_root_anchors",
-	"get_items",
+	"get_all_items_from_anchor",
 	"get_all_items",
 	"get_all_items_from_b64",
+	"get_all_root_anchors",
+	"get_items",
 	"get_leaf_anchors",
 	"get_typed_anchor",
-	"get_typed_children",];
+	"get_typed_children",
+
+];
 
 
 /** Generate tuple array of function names with given zomeName */
