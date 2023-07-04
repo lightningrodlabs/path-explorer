@@ -3,6 +3,8 @@ import {TaskerZvm} from "./tasker.zvm"
 import {AgentDirectoryZvm} from "@ddd-qc/agent-directory"
 import {AppSignalCb} from "@holochain/client";
 import {PathExplorerZvm} from "@path-explorer/elements/dist/viewModels/path-explorer.zvm";
+import {ProfilesZvm} from "./profiles.zvm";
+import {ProfileDef} from "./profiles.proxy";
 
 
 /**
@@ -17,6 +19,7 @@ import {PathExplorerZvm} from "@path-explorer/elements/dist/viewModels/path-expl
    TaskerZvm,
    [PathExplorerZvm, "zPathExplorer"],
    [AgentDirectoryZvm, "zAgentDirectory"],
+   [ProfilesZvm, "profiles"],
   ];
 
   readonly signalHandler?: AppSignalCb;
@@ -26,6 +29,7 @@ import {PathExplorerZvm} from "@path-explorer/elements/dist/viewModels/path-expl
   get taskerZvm(): TaskerZvm {return this.getZomeViewModel(TaskerZvm.DEFAULT_ZOME_NAME) as TaskerZvm}
   get pathExplorerZvm(): PathExplorerZvm {return this.getZomeViewModel("zPathExplorer") as PathExplorerZvm}
   get AgentDirectoryZvm(): AgentDirectoryZvm {return this.getZomeViewModel("zAgentDirectory") as AgentDirectoryZvm}
+  get profilesZvm(): ProfilesZvm {return this.getZomeViewModel("profiles") as ProfilesZvm}
 
 
   /** -- ViewModel Interface -- */
@@ -33,5 +37,17 @@ import {PathExplorerZvm} from "@path-explorer/elements/dist/viewModels/path-expl
   protected hasChanged(): boolean {return true}
 
   get perspective(): void {return}
+
+
+  /** -- */
+
+  protected async dvmUpdated(newDvm: TaskerDvm, oldDvm?: TaskerDvm): Promise<void> {
+   const dummyProfile: ProfileDef = {
+     nickname: "camille",
+     fields: {},
+   }
+   console.log("taskerDvm.dvmUpdated()", dummyProfile);
+   newDvm.profilesZvm.createMyProfile(dummyProfile);
+  }
 
 }

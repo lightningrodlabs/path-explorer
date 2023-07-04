@@ -8,7 +8,7 @@ import "@ui5/webcomponents/dist/Tree.js"
 import "@ui5/webcomponents/dist/TreeItem.js";
 import "@ui5/webcomponents/dist/BusyIndicator.js";
 import {PathExplorerZvm} from "../viewModels/path-explorer.zvm";
-import {utf32Decode} from "../utils";
+import {linkType2str, utf32Decode} from "../utils";
 
 
 /**
@@ -23,7 +23,7 @@ export class LinkList extends ZomeElement<unknown, PathExplorerZvm> {
   }
 
 
-  @property() rootHash?: AnyDhtHashB64;
+  @property() base?: AnyDhtHashB64;
 
   @state() private _itemLinks: ItemLink[] = [];
   @state() private _zomes: ZomeName[] = [];
@@ -33,14 +33,14 @@ export class LinkList extends ZomeElement<unknown, PathExplorerZvm> {
 
 
   /** */
-  async scanRoot() {
-    console.log("<link-list>.scanRoot()", this.rootHash);
+  async probeBase() {
+    console.log("<link-list>.probeBase()", this.base);
     //const b64 = new TextEncoder().encode(this.rootHash);
-    if (!this.rootHash) {
+    if (!this.base) {
       return;
     }
-    const rootHash = decodeHashFromBase64(this.rootHash);
-    this._itemLinks = await this._zvm.zomeProxy.getAllItems(rootHash);
+    const baseHash = decodeHashFromBase64(this.base);
+    this._itemLinks = await this._zvm.zomeProxy.getAllItems(baseHash);
   }
 
 
@@ -48,8 +48,8 @@ export class LinkList extends ZomeElement<unknown, PathExplorerZvm> {
    shouldUpdate(changedProperties: PropertyValues<this>) {
     super.shouldUpdate(changedProperties);
     //console.log("ZomeElement.shouldUpdate() start", !!this._zvm, this.installedCell);
-    if (changedProperties.has("rootHash") && this._zvm) {
-      this.scanRoot();
+    if (changedProperties.has("base") && this._zvm) {
+      this.probeBase();
     }
     return true;
   }
@@ -57,7 +57,7 @@ export class LinkList extends ZomeElement<unknown, PathExplorerZvm> {
 
   /** */
   protected async zvmUpdated(newZvm: PathExplorerZvm, oldZvm?: PathExplorerZvm): Promise<void> {
-    console.log("<link-list>.zvmUpdated()", this.rootHash);
+    console.log("<link-list>.zvmUpdated()", this.base);
     const zi = await newZvm.zomeProxy.zomeInfo();
     console.log({zi});
     this._linkTypes = zi.zome_types.links;
@@ -68,7 +68,6 @@ export class LinkList extends ZomeElement<unknown, PathExplorerZvm> {
 
   /** */
   renderLinkTree(): TemplateResult<1> {
-    const linkKeys = [""]; // FIXME: Object.keys(ThreadsLinkTypeType);
     if (!this._itemLinks) {
       return html`No root set`
     }
@@ -85,15 +84,16 @@ export class LinkList extends ZomeElement<unknown, PathExplorerZvm> {
           tag = new TextDecoder().decode(new Uint8Array(ll.tag));
         }
         const hash = encodeHashToBase64(new Uint8Array(ll.itemHash));
-        const additionalText = tag? linkKeys[ll.linkIndex] + " | " + tag : linkKeys[ll.linkIndex];
+        const linkTypeStr = linkType2str(ll);
+        const additionalText = tag? linkTypeStr + " | " + tag : linkTypeStr;
         return html`<ui5-tree-item id="${hash}" text="${hash}" additional-text="${additionalText}"></ui5-tree-item>`
       });
     console.log({children})
-    const header = "Viewing: " + this.rootHash? this.rootHash : "<none>";
+    const header = "Viewing: " + this.base? this.base : "<none>";
 
     return html`
       <ui5-busy-indicator id="busy" style="width: 100%">
-        <ui5-tree id="linkTree" mode="None" .header-text="${header}" no-data-text="No links found">
+        <ui5-tree id="linkTree" mode="None" header-text="${header}" no-data-text="No links found">
           ${children}
         </ui5-tree>
       </ui5-busy-indicator>
@@ -124,7 +124,7 @@ export class LinkList extends ZomeElement<unknown, PathExplorerZvm> {
   /** */
   onProbe(e:any) {
     const input = this.shadowRoot!.getElementById("baseInput") as HTMLInputElement;
-    this.rootHash = input.value;
+    this.base = input.value;
   }
 
 
@@ -137,7 +137,7 @@ export class LinkList extends ZomeElement<unknown, PathExplorerZvm> {
 
     /** render all */
     return html`
-        <h3>Link Tree</h3>
+        <h3>Links Explorer</h3>
           <label for="baseInput">Base:</label>
           <input style="min-width: 400px;" type="text" id="baseInput" name="title">
           <input type="button" value="Probe" @click=${this.onProbe}>

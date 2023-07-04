@@ -105,8 +105,12 @@ pub fn batch_convert_path_to_anchor(tps: Vec<TypedPath>) -> ExternResult<Vec<Typ
     //let leaf = child_pair.1.leaf().unwrap();
     //let leaf_str = String::try_from(leaf).unwrap();
     //debug!("get_anchor_children()    - leaf: '{}' ; tag = {:?}", leaf_str, child_path.make_tag());
+    debug!("path2anchor('{:?}')", tp.path);
     let Ok(str) = path2anchor(&tp.path)
-      else { return Err(wasm_error!(WasmErrorInner::Guest("Failed to convert Path to Anchor".to_string()))) };
+      else {
+        debug!("Failed to convert Path to Anchor: {:?}", tp.path);
+        continue;
+      };
     res.push(TypedAnchor::new(str, this_zome_index, tp.link_type.zome_type.0));
   }
   Ok(res)

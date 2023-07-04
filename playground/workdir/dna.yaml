@@ -8,6 +8,8 @@ integrity:
       bundled: ../../target/wasm32-unknown-unknown/release/tasker_model.wasm
     - name: agent_directory_integrity
       bundled: ../../target/wasm32-unknown-unknown/release/agent_directory_integrity.wasm
+    - name: profiles_integrity
+      bundled: ../../target/wasm32-unknown-unknown/release/profiles_integrity_zome.wasm
 coordinator:
   zomes:
     - name: zPathExplorer
@@ -20,3 +22,7 @@ coordinator:
       bundled: ../../target/wasm32-unknown-unknown/release/agent_directory.wasm
       dependencies:
         - name: agent_directory_integrity
+    - name: profiles
+      bundled: ../../target/wasm32-unknown-unknown/release/profiles_zome.wasm
+      dependencies:
+        - name: profiles_integrity

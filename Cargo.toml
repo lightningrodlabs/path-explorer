@@ -8,6 +8,8 @@ members = [
   "playground/zomes/tasker",
   "playground/zomes/agent_directory",
   "playground/zomes/agent_directory_integrity",
+  "playground/zomes/profiles",
+  "playground/zomes/profiles_integrity",
   #"sweettest",
 ]
 

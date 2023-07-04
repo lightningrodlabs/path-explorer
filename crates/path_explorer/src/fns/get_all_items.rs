@@ -23,8 +23,8 @@ pub fn get_all_items(hash: AnyLinkableHash) -> ExternResult<Vec<ItemLink>>  {
   let mut links = get_links(hash, all_dna_link_types(), None)?;
   debug!("from hash: found {} children", links.len());
   /// Only need one of each hash.
-  links.sort_unstable_by(|a, b| a.tag.cmp(&b.tag));
-  links.dedup_by(|a, b| a.tag.eq(&b.tag));
+  //links.sort_unstable_by(|a, b| a.tag.cmp(&b.tag));
+  //links.dedup_by(|a, b| a.tag.eq(&b.tag));
   /// Convert to ItemLinks
   let res = links.into_iter().map(|link| ItemLink::from(link)).collect();
   Ok(res)
@@ -39,8 +39,8 @@ pub fn get_all_items_from_b64(b64: AnyLinkableHashB64) -> ExternResult<Vec<ItemL
   let mut links = get_links(hash, all_dna_link_types(), None)?;
   debug!("b64: found {} children", links.len());
   /// Only need one of each hash.
-  links.sort_unstable_by(|a, b| a.tag.cmp(&b.tag));
-  links.dedup_by(|a, b| a.tag.eq(&b.tag));
+  //links.sort_unstable_by(|a, b| a.tag.cmp(&b.tag));
+  //links.dedup_by(|a, b| a.tag.eq(&b.tag));
   /// Convert to ItemLinks
   let res = links.into_iter().map(|link| ItemLink::from(link)).collect();
   Ok(res)
