@@ -78,13 +78,10 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
   @property() rootTypedAnchor: TypedAnchor | undefined = undefined
 
   @state() private _level0: LinkTreeItem[] = [];
-
   @state() private _linkTypes: ScopedZomeTypes = [];
   @state() private _zomeNames: ZomeName[] = [];
 
-  //@state() private _isTyped = true;
-
-
+  // TODO
   @property()
   canProgressiveWalk: boolean = true; // TODO: set probing behavior to traverse the AnchorTree directly on first expand or not
 
@@ -95,7 +92,7 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
   /** */
   protected async zvmUpdated(newZvm: PathExplorerZvm, oldZvm?: PathExplorerZvm): Promise<void> {
     const zi = await newZvm.zomeProxy.zomeInfo();
-    //console.log({zi});
+    console.log("<anchor-tree>.zvmUpdated()", newZvm, oldZvm, zi);
     this._linkTypes = zi.zome_types.links;
     const di = await newZvm.zomeProxy.dnaInfo();
     this._zomeNames = di.zome_names;
