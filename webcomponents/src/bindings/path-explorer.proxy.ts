@@ -145,6 +145,10 @@ export class PathExplorerProxy extends ZomeProxy {
   static readonly DEFAULT_ZOME_NAME = "zPathExplorer"
   static readonly FN_NAMES = pathExplorerFunctionNames
  
+  async getAllChildren(ta: TypedAnchor): Promise<TypedAnchor[]> {
+    return this.call('get_all_children', ta);
+  }
+
   async getAllItemsFromAnchor(leafAnchor: string): Promise<ItemLink[]> {
     return this.call('get_all_items_from_anchor', leafAnchor);
   }
@@ -165,8 +169,8 @@ export class PathExplorerProxy extends ZomeProxy {
     return this.call('get_items', input);
   }
 
-  async getLeafAnchors(ta: TypedAnchor): Promise<TypedAnchor[]> {
-    return this.call('get_leaf_anchors', ta);
+  async getLeafs(ta: TypedAnchor): Promise<TypedAnchor[]> {
+    return this.call('get_leafs', ta);
   }
 
   async getTypedAnchor(anchor: string): Promise<[EntryHashB64, TypedAnchor | null]> {

@@ -24,9 +24,33 @@ import {AnyLinkableHashB64, FlatScopedLinkType, linkType2NamedStr, linkType2str}
 
 const ZOME_LINK_NAMES = [""]; // FIXME Get Link names somehow once Holo provides an API for that ; Object.keys(ThreadsLinkTypeType);
 
+/** */
 export interface AnchorTreeItem {
-  origin:  AnyLinkableHashB64 | string /* Anchor */,
+  base: AnyLinkableHashB64 | string /* Anchor */,
+  isAnchor: boolean,
   slt?: FlatScopedLinkType,
+}
+
+
+/** */
+function toAnchorTreeItem(ti: TreeItem): AnchorTreeItem | null {
+  const isAnchor = ti.getAttribute("is-anchor");
+  const zomeIndex = ti.getAttribute("zomeIndex");
+  const linkIndex = ti.getAttribute("linkIndex");
+
+  if (!isAnchor) {
+    return null;
+  }
+  const ati = {
+    base: ti.id,
+    isAnchor: Boolean(isAnchor),
+    slt: {
+      zomeIndex: Number(zomeIndex),
+      linkIndex: Number(linkIndex),
+    }
+  };
+  //console.log("toLinkTreeItem()", ti, lti);
+  return ati;
 }
 
 
@@ -42,19 +66,6 @@ function getLeafComponent(anchor: String): string {
   return subs[subs.length - 1];
 }
 
-
-/** */
-function toAnchorTreeItem(ti: TreeItem) {
-  const lti = {
-    origin: ti.getAttribute("origin"),
-    slt: {
-      zomeIndex: Number(ti.getAttribute("zomeIndex")),
-      linkIndex: Number(ti.getAttribute("linkIndex")),
-    }
-  };
-  //console.log("toLinkTreeItem()", ti, lti);
-  return lti;
-}
 
 
 /**
@@ -133,16 +144,18 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
 
 
   /** */
-  toLevel0TreeItem(lti: AnchorTreeItem): TemplateResult {
+  toLevel0TreeItem(ati: AnchorTreeItem): TemplateResult {
     //console.log("toLevel0TreeItem()", lti)
-    if (lti.slt == undefined) {
-      console.warn("toLevel0TreeItem() aborted. Missing linkIndex argument.");
+    if (ati.slt == undefined) {
+      console.warn("toLevel0TreeItem() aborted. Missing FlatScopedLinkType field in function argument.");
       return html``;
     }
-    const id = "anchor__" +  lti.origin;
-    const linkTypeName = linkType2NamedStr(lti.slt, this._zomeNames) //linkType2str(lti.slt);
-    return html`<ui5-tree-item id="${id}" text="${lti.origin}" additional-text=${linkTypeName} has-children
-                             origin="${lti.origin}" zomeIndex="${lti.slt.zomeIndex}" linkIndex="${lti.slt.linkIndex}"></ui5-tree-item>`
+    const linkTypeName = linkType2NamedStr(ati.slt, this._zomeNames) //linkType2str(lti.slt);
+    return html`<ui5-tree-item id="${ati.base}"
+                               text="${ati.base}" additional-text=${linkTypeName}
+                               has-children
+                               zomeIndex="${ati.slt.zomeIndex}" linkIndex="${ati.slt.linkIndex}" is-anchor="true"
+    ></ui5-tree-item>`;
   }
 
 
@@ -170,7 +183,11 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
     }
     console.log("TypedAnchors", tas);
     this._level0 = tas.map((ta): AnchorTreeItem => {
-      return {origin: ta.anchor, slt: {zomeIndex: ta.zomeIndex, linkIndex: ta.linkIndex}}
+      return {
+        base: ta.anchor,
+        isAnchor: true,
+        slt: {zomeIndex: ta.zomeIndex, linkIndex: ta.linkIndex}
+      }
     });
   }
 
@@ -183,7 +200,8 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
     /** */
     return html`
       <ui5-busy-indicator id="busy" style="width: 100%">
-        <ui5-tree id="rootAnchorTree" mode="None" no-data-text="No (sub)anchors found"
+        <ui5-tree id="rootAnchorTree"
+                  mode="None" no-data-text="No (sub)anchors found"
                   header-text=${title}
                   @item-toggle="${this.toggleTreeItem}"
                   @click="${this.clickTree}"
@@ -192,6 +210,104 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
         </ui5-tree>
       </ui5-busy-indicator>
     `
+  }
+
+
+  /** onToggle fetch the children of the toggled anchor */
+  async toggleTreeItem(event:any) {
+    const busyIndicator = this.shadowRoot!.getElementById("busy") as BusyIndicator;
+    const toggledTreeItem = event.detail.item as TreeItem; // get the node that is toggled
+    /** Don't do anything if Tree is already expanded */
+    if (toggledTreeItem.expanded) {
+      return;
+    }
+
+    const treeItem = toAnchorTreeItem(toggledTreeItem);
+    const isTyped = !!toggledTreeItem.getAttribute("linkIndex");
+    console.log("toggleTreeItem()", treeItem, isTyped);
+
+    /* Make sure it's an Anchor TreeItem */
+    if (!treeItem || !treeItem.isAnchor) {
+      return;
+    }
+
+    /** Lock Tree */
+    event.preventDefault();
+    busyIndicator.active = true;
+
+    /** Keep already existing children */
+    let currentItemTexts = [];
+    for (const item of toggledTreeItem.items) {
+      currentItemTexts.push((item as TreeItem).text);
+    }
+    console.log("toggleTreeItem() currentItemTexts", currentItemTexts, isTyped);
+
+    /** Grab children */
+    let children_tas: TypedAnchor[] = [];
+    if (isTyped && treeItem.base) {
+      children_tas = await this._zvm.zomeProxy.getTypedChildren({anchor: treeItem.base, zomeIndex: treeItem.slt!.zomeIndex, linkIndex: treeItem.slt!.linkIndex});
+    }
+    // else {
+    //   let linkItems = await this._zvm.zomeProxy.getAllItemsFromAnchor(lti.origin);
+    //   //any_children_tas = await this._zvm.zomeProxy.getAllChildren(lti.origin);
+    //
+    // }
+    console.log("toggleTreeItem() children_tas", children_tas);
+
+
+    /** If it has children, then it's a non-LeafAnchor, so create a TreeItem for each child Anchor */
+    for (const ta of children_tas) {
+      const leafComponent = getLeafComponent(ta.anchor);
+      /* Skip if child TreeItem is already part of the Tree */
+      if (currentItemTexts.includes(leafComponent)) {
+        continue;
+      }
+      let newItem = document.createElement("ui5-tree-item") as TreeItem;
+      newItem.text = leafComponent;
+      newItem.additionalText = ta.anchor;
+      newItem.setAttribute("zomeIndex", ta.zomeIndex.toString());
+      newItem.setAttribute("linkIndex", ta.linkIndex.toString());
+      newItem.setAttribute("is-anchor", "true");
+      newItem.id = ta.anchor;
+      newItem.hasChildren = true;
+      newItem.level = toggledTreeItem.level + 1;
+      toggledTreeItem.appendChild(newItem); // add the newly fetched node to the tree
+    }
+
+
+    /** If it has no children then it must be a leaf, so grab its Items instead and create a TreeItem for each */
+    if (children_tas.length == 0) {
+      let itemHashs = [];
+      for (const item of toggledTreeItem.items) {
+        itemHashs.push(item.id);
+      }
+      const itemLinks = await this._zvm.zomeProxy.getAllItemsFromAnchor(toggledTreeItem.id);
+      console.log({itemLinks})
+      for (const itemLink of itemLinks) {
+        const tag = new TextDecoder().decode(new Uint8Array(itemLink.tag));
+        const hash = encodeHashToBase64(new Uint8Array(itemLink.itemHash));
+        /* Skip if child TreeItem is already part of the Tree */
+        if (itemHashs.includes(hash)) {
+          continue;
+        }
+        var newItem = document.createElement("ui5-tree-item") as TreeItem;
+        newItem.text = hash;
+        newItem.additionalText = tag // tag ? ZOME_LINK_NAMES[itemLink.linkIndex] + " | " + tag : ZOME_LINK_NAMES[itemLink.linkIndex];
+        newItem.setAttribute("is-anchor", "false");
+        // /** Set LinkType only if it's the same, in order to determine if we reached leafItems */
+        // if (itemLink.zomeIndex.toString() == toggledTreeItem.getAttribute("zomeIndex") && itemLink.linkIndex.toString() == toggledTreeItem.getAttribute("linkIndex")) {
+        //   newItem.setAttribute("zomeIndex", itemLink.zomeIndex.toString());
+        //   newItem.setAttribute("linkIndex", itemLink.linkIndex.toString());
+        // }
+        newItem.id = hash;
+        newItem.level = toggledTreeItem.level + 1;
+        toggledTreeItem.appendChild(newItem); // add the newly fetched node to the tree
+      }
+    }
+
+    /** Toggle and unlock Tree */
+    toggledTreeItem.toggle();
+    busyIndicator.active = false;
   }
 
 
@@ -206,108 +322,6 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
     }
   }
 
-
-  /** onToggle fetch the children of the toggled anchor */
-  async toggleTreeItem(event:any) {
-    const busyIndicator = this.shadowRoot!.getElementById("busy") as BusyIndicator;
-    const toggledTreeItem = event.detail.item as TreeItem ; // get the node that is toggled
-    const lti = toAnchorTreeItem(toggledTreeItem);
-    //const isTyped = !!this.root && typeof this.root == 'object';
-    const isTyped = !!toggledTreeItem.getAttribute("linkIndex");
-
-    console.log("toggleTreeItem()", lti.origin, isTyped);
-
-    /* Handle TreeItem marked as "anchor__" */
-    if (toggledTreeItem.id.length > 8 && toggledTreeItem.id.substring(0, 8) === "anchor__") {
-      if (toggledTreeItem.expanded) {
-        return;
-      }
-      event.preventDefault(); // do not let the toggle button switch yet
-      busyIndicator.active = true; // block the tree from the user
-
-      /** Keep already existing children */
-      let currentItemTexts = [];
-      for (const item of toggledTreeItem.items) {
-        currentItemTexts.push((item as TreeItem).text);
-      }
-      console.log("toggleTreeItem() currentItemTexts", currentItemTexts, isTyped);
-
-      /** Grab children */
-      let all_children_tas: TypedAnchor[] = [];
-      if (isTyped && lti.origin) {
-        all_children_tas = await this._zvm.zomeProxy.getTypedChildren({anchor: lti.origin, zomeIndex: lti.slt.zomeIndex, linkIndex: lti.slt.linkIndex});
-      }
-      // else {
-      //   let linkItems = await this._zvm.zomeProxy.getAllItemsFromAnchor(lti.origin);
-      //   //any_children_tas = await this._zvm.zomeProxy.getAllChildren(lti.origin);
-      //
-      // }
-      console.log("toggleTreeItem() any_children_tas", all_children_tas);
-
-
-      /** Handle branch */
-      for (const ta of all_children_tas) {
-        const leafComponent = getLeafComponent(ta.anchor);
-        /* Skip if item already exists */
-        if (currentItemTexts.includes(leafComponent)) {
-          continue;
-        }
-        let newItem = document.createElement("ui5-tree-item") as TreeItem;
-        newItem.text = leafComponent;
-        newItem.additionalText = "[" + ta.anchor + "]";
-        newItem.setAttribute("origin", ta.anchor);
-        newItem.setAttribute("zomeIndex", ta.zomeIndex.toString());
-        newItem.setAttribute("linkIndex", ta.linkIndex.toString());
-        newItem.id = "anchor__" + ta.anchor;
-        newItem.hasChildren = true;
-        newItem.level = toggledTreeItem.level + 1;
-        toggledTreeItem.appendChild(newItem); // add the newly fetched node to the tree
-      }
-
-
-      /** Handle LeafAnchor: Get Items */
-      if (all_children_tas.length == 0) {
-        let itemHashs = [];
-        for (const item of toggledTreeItem.items) {
-          itemHashs.push(item.id);
-        }
-
-        const maybeOriginAttribute = toggledTreeItem.getAttribute("origin");
-        const itemLinks = await this._zvm.zomeProxy.getAllItemsFromAnchor(maybeOriginAttribute? maybeOriginAttribute : "");
-        console.log({itemLinks})
-        for (const itemLink of itemLinks) {
-          const tag = new TextDecoder().decode(new Uint8Array(itemLink.tag));
-          const hash = encodeHashToBase64(new Uint8Array(itemLink.itemHash));
-
-          if (itemHashs.includes(hash)) {
-            continue;
-          }
-          var newItem = document.createElement("ui5-tree-item") as TreeItem;
-          newItem.text = hash;
-          newItem.additionalText = tag // tag ? ZOME_LINK_NAMES[itemLink.linkIndex] + " | " + tag : ZOME_LINK_NAMES[itemLink.linkIndex];
-          newItem.setAttribute("origin", hash);
-          // /** Set LinkType only if it's the same, in order to determine if we reached leafItems */
-          // if (itemLink.zomeIndex.toString() == toggledTreeItem.getAttribute("zomeIndex") && itemLink.linkIndex.toString() == toggledTreeItem.getAttribute("linkIndex")) {
-          //   newItem.setAttribute("zomeIndex", itemLink.zomeIndex.toString());
-          //   newItem.setAttribute("linkIndex", itemLink.linkIndex.toString());
-          // }
-          newItem.id = hash;
-          newItem.level = toggledTreeItem.level + 1;
-          toggledTreeItem.appendChild(newItem); // add the newly fetched node to the tree
-        }
-      }
-
-      toggledTreeItem.toggle(); // manually switch the toggle button
-      busyIndicator.active = false; // unblock the tree
-
-    }
-
-  }
-
-
-  // cellName(cell: Cell): string {
-  //   return `Cell "${cell.name}${this.cloneId? "." + this.cloneId: ""}": ${this.dnaHash}`;
-  // }
 
   /** */
   render() {
@@ -353,7 +367,8 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
 
   /** */
   async onProbeROOT(e:any) {
-    this.rootTypedAnchor = undefined ;
+    this._level0 = [];
+    this.rootTypedAnchor = undefined;
     await this.walkRootAnchor();
     const input = this.shadowRoot!.getElementById("rootInput") as Input;
     input.value = '';
@@ -367,6 +382,7 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
       this.rootTypedAnchor = undefined;
       return;
     }
+    this._level0 = [];
     //const isHash = Base64.isValid(input.value) &&  input.value.substring(0, 3) == "uhC"
     //console.log("onWalk()", input.value, isHash)
     const maybeTypedAnchor = await this._zvm.zomeProxy.getTypedAnchor(input.value);
@@ -376,4 +392,15 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
     }
   }
 
+  /** */
+  static get styles() {
+    return [
+      css`
+          :host {
+            padding-left:5px;
+            padding-right:5px;
+          }
+      `
+    ];
+  }
 }

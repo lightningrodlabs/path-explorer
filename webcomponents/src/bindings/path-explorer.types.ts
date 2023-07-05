@@ -145,6 +145,7 @@ export interface TypedAnchor {
   linkIndex: number
 }
 
+/** LinkTypes to get */
 export type MyLinkFilter = [number, number[]][];
 
 /**  */

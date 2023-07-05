@@ -89,11 +89,12 @@ export class LinkList extends ZomeElement<unknown, PathExplorerZvm> {
         return html`<ui5-tree-item id="${hash}" text="${hash}" additional-text="${additionalText}"></ui5-tree-item>`
       });
     console.log({children})
-    const header = `Viewing ${this.base? this.base : "none"}`;
+    const header = `Viewing "${this.base? this.base : "none"}"`;
 
     return html`
       <ui5-busy-indicator id="busy" style="width: 100%">
-        <ui5-tree id="linkTree" header-text=${header} no-data-text="No links found">
+        <ui5-tree id="linkTree"
+                  header-text=${header} no-data-text="No links found">
           ${children}
         </ui5-tree>
       </ui5-busy-indicator>
@@ -138,39 +139,52 @@ export class LinkList extends ZomeElement<unknown, PathExplorerZvm> {
     /** render all */
     return html`
         <h3>Links Explorer</h3>
-          <label for="baseInput">Base:</label>
-          <input style="min-width: 400px;" type="text" id="baseInput" name="title"
-                 @keypress=${(event:any) => {
-                  console.log("input event", event);
-                  if (event.key === "Enter") {
-                      this.onProbe(event);
-                  }
-                }}>
-          <input type="button" value="Probe" @click=${this.onProbe}>
-          <div style="margin-top:5px;">
-              Filter by
-            <span>zome:</span>
-            <select name="zomeSelector" id="zomeSelector" @click=${this.onZomeSelect}>
-                ${Object.values(this._zomeNames).map(
-                        (zomeName) => {
-                            return html`<option>${zomeName}</option>`
-                        }
-                )}
-            </select>
-            <span>, link type:</span>
-            <select name="linkTypeSelector" id="linkTypeSelector" @click=${this.onLinkTypeSelect}>
-                ${this._linkTypes.length > 0? this._linkTypes[0].map(
-                        (linkIndex) => {
-                            return html`<option>${linkIndex}</option>`
-                        }
-                ): html``}
-            </select>
-            <button @click="${() => {this._linkTypeFilter = undefined;}}">Reset</button>
-          </div>
-          <div>
+        <label for="baseInput">Base:</label>
+        <input style="min-width: 400px;" type="text" id="baseInput" name="title"
+               @keypress=${(event:any) => {
+                console.log("input event", event);
+                if (event.key === "Enter") {
+                    this.onProbe(event);
+                }
+              }}>
+        <input type="button" value="Probe" @click=${this.onProbe}>
+        <div style="margin-top:5px;">
+          Filter by
+          <span>zome:</span>
+          <select name="zomeSelector" id="zomeSelector" @click=${this.onZomeSelect}>
+              ${Object.values(this._zomeNames).map(
+                      (zomeName) => {
+                          return html`<option>${zomeName}</option>`
+                      }
+              )}
+          </select>
+          <span>, link type:</span>
+          <select name="linkTypeSelector" id="linkTypeSelector" @click=${this.onLinkTypeSelect}>
+              ${this._linkTypes.length > 0? this._linkTypes[0].map(
+                      (linkIndex) => {
+                          return html`<option>${linkIndex}</option>`
+                      }
+              ): html``}
+          </select>
+          <button @click="${() => {this._linkTypeFilter = undefined;}}">Reset</button>
+        </div>
+        <div>
           ${this.renderLinkTree()}
         </div>
     `;
   }
 
+
+  /** */
+  static get styles() {
+    return [
+      css`
+          :host {
+            padding-left:5px;
+            padding-right:5px;
+          }
+      `
+    ];
+  }
 }
+
