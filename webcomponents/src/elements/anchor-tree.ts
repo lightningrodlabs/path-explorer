@@ -91,8 +91,9 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
 
   /** */
   protected async zvmUpdated(newZvm: PathExplorerZvm, oldZvm?: PathExplorerZvm): Promise<void> {
+    console.log("<anchor-tree>.zvmUpdated()", newZvm, oldZvm);
     const zi = await newZvm.zomeProxy.zomeInfo();
-    console.log("<anchor-tree>.zvmUpdated()", newZvm, oldZvm, zi);
+    //console.log("<anchor-tree>.zvmUpdated()" zi);
     this._linkTypes = zi.zome_types.links;
     const di = await newZvm.zomeProxy.dnaInfo();
     this._zomeNames = di.zome_names;

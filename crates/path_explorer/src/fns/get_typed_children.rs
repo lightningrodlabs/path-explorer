@@ -1,6 +1,5 @@
 use hdk::prelude::*;
-
-use crate::*;
+use path_explorer_types::*;
 
 /// Return all children LeafAnchors of same link-type as parent Anchor
 #[hdk_extern]

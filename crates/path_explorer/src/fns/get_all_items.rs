@@ -1,7 +1,7 @@
 use hdk::prelude::*;
 use hdk::prelude::holo_hash::{AnyLinkableHashB64};
 use zome_utils::*;
-use crate::*;
+use path_explorer_types::*;
 
 
 /// Return all ItemLinks from a LeafAnchor
@@ -20,7 +20,7 @@ pub fn get_all_items_from_anchor(leaf_anchor: String) -> ExternResult<Vec<ItemLi
 /// Return all ItemLinks from a hash
 #[hdk_extern]
 pub fn get_all_items(hash: AnyLinkableHash) -> ExternResult<Vec<ItemLink>>  {
-  let mut links = get_links(hash, all_dna_link_types(), None)?;
+  let /*mut*/ links = get_links(hash, all_dna_link_types(), None)?;
   debug!("from hash: found {} children", links.len());
   /// Only need one of each hash.
   //links.sort_unstable_by(|a, b| a.tag.cmp(&b.tag));
@@ -36,7 +36,7 @@ pub fn get_all_items(hash: AnyLinkableHash) -> ExternResult<Vec<ItemLink>>  {
 pub fn get_all_items_from_b64(b64: AnyLinkableHashB64) -> ExternResult<Vec<ItemLink>>  {
   let hash: AnyLinkableHash = b64.clone().into();
   debug!("b64: {} -> {}", b64, hash);
-  let mut links = get_links(hash, all_dna_link_types(), None)?;
+  let /*mut*/ links = get_links(hash, all_dna_link_types(), None)?;
   debug!("b64: found {} children", links.len());
   /// Only need one of each hash.
   //links.sort_unstable_by(|a, b| a.tag.cmp(&b.tag));

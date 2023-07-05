@@ -1,8 +1,9 @@
 use hdk::hash_path::path::Component;
 use hdk::prelude::*;
 use hdk::prelude::holo_hash::EntryHashB64;
-use crate::*;
 use crate::fns::get_all_root_anchors;
+use path_explorer_types::*;
+
 
 /// Determine TypedAnchor from anchor, by looking for parent
 /// Return EntryHash of anchor if no parents found

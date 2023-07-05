@@ -1,8 +1,7 @@
 use hdk::hash_path::path::{root_hash};
 use hdk::prelude::*;
 use zome_utils::*;
-
-use crate::*;
+use path_explorer_types::*;
 
 
 /// Return all RootAnchors from all Zomes.

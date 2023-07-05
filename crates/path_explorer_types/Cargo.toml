@@ -1,5 +1,5 @@
 [package]
-name = "path_explorer"
+name = "path_explorer_types"
 version.workspace = true
 rust-version.workspace = true
 edition.workspace = true
@@ -12,6 +12,5 @@ serde.workspace = true
 hdk.workspace = true
 
 zome_utils.workspace = true
-time_indexing.workspace = true
 
-path_explorer_types = {path = "../path_explorer_types" }
+

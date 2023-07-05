@@ -1,5 +1,5 @@
 use hdk::prelude::*;
-use crate::*;
+use path_explorer_types::*;
 
 #[hdk_extern]
 pub fn get_leaf_anchors(ta: TypedAnchor) -> ExternResult<Vec<TypedAnchor>> {
