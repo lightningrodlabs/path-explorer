@@ -16,7 +16,8 @@ pub fn get_all_root_anchors(_ : ()) -> ExternResult<Vec<TypedAnchor>> {
   )?;
   let mut res = Vec::new();
   for link in links {
-    let str = compTag2str(&link.tag).unwrap();
+    let Ok(str) = compTag2str(&link.tag)
+      else { continue };
     debug!("zome_index = {} | link_type = {} | tag = {}", link.zome_index.0, link.link_type.0, str);
     res.push(TypedAnchor::new(str, /*get_zome_index(&zome_name)*/ link.zome_index.0, link.link_type.0));
   }

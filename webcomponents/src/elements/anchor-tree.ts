@@ -24,7 +24,7 @@ import {AnyLinkableHashB64, FlatScopedLinkType, linkType2NamedStr, linkType2str}
 
 const ZOME_LINK_NAMES = [""]; // FIXME Get Link names somehow once Holo provides an API for that ; Object.keys(ThreadsLinkTypeType);
 
-export interface LinkTreeItem {
+export interface AnchorTreeItem {
   origin:  AnyLinkableHashB64 | string /* Anchor */,
   slt?: FlatScopedLinkType,
 }
@@ -44,7 +44,7 @@ function getLeafComponent(anchor: String): string {
 
 
 /** */
-function toLinkTreeItem(ti: TreeItem) {
+function toAnchorTreeItem(ti: TreeItem) {
   const lti = {
     origin: ti.getAttribute("origin"),
     slt: {
@@ -58,36 +58,39 @@ function toLinkTreeItem(ti: TreeItem) {
 
 
 /**
- * Element for displaying a tree of Links
- * An AnchorTree is a tree of all Paths using the same link-type
+ * Element for displaying a tree of Anchors and their items
+ * An AnchorTree is a tree of all Paths using the same link-type.
  * Purpose:
- * 1. Display all links all types from ROOT
- * 2. Display all links all types from any linkable hash
- * 3. Display all links of same link-type from some Anchor (i.e. AnchorTree)
- *    b. with Items
+ * 1. Display all paths all types from ROOT
+ * 2. Display all paths (and items) of same link-type from some Anchor (i.e. AnchorTree)
  */
 @customElement("anchor-tree")
 export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
 
   constructor() {
     super(PathExplorerZvm.DEFAULT_ZOME_NAME);
-    //console.log("<anchor-tree>.ctor()")
   }
 
 
+  /** If no root anchor is provided, then it will start from ROOT */
   @property() rootTypedAnchor: TypedAnchor | undefined = undefined
 
-  @state() private _level0: LinkTreeItem[] = [];
+
+  /** The TreeItems at level 0 */
+  @state() private _level0: AnchorTreeItem[] = [];
+
+  /** ZomeInfo */
   @state() private _linkTypes: ScopedZomeTypes = [];
   @state() private _zomeNames: ZomeName[] = [];
 
-  // TODO
-  @property()
-  canProgressiveWalk: boolean = true; // TODO: set probing behavior to traverse the AnchorTree directly on first expand or not
 
+  // TODO
+  @property() canProgressiveWalk: boolean = true; // TODO: set probing behavior to traverse the AnchorTree directly on first expand or not
   // TODO: Implement ExpandAll button
   // TODO: Add refresh buttons to branch items
 
+
+  /** -- Methods -- */
 
   /** */
   protected async zvmUpdated(newZvm: PathExplorerZvm, oldZvm?: PathExplorerZvm): Promise<void> {
@@ -100,29 +103,11 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
   }
 
 
-  /** */
-  renderLeafAnchor(rootAnchors: TypedAnchor[]): TemplateResult<1> {
-    return html``;
-  }
-
-  /** */
-  async expandAll(): Promise<void> {
-    // FIXME
-  }
-
-
   /** Probe rootAnchors at startup */
   protected firstUpdated() {
     this.walkRootAnchor();
   }
 
-
-  // /** */
-  // protected zvmUpdated(newZvm: ThreadsZvm, oldZvm?: ThreadsZvm): Promise<void> {
-  //   super.zvmUpdated(newZvm, oldZvm);
-  //   this.probeRootAnchors();
-  //   return;
-  // }
 
   /** */
   shouldUpdate(changedProperties: PropertyValues<this>) {
@@ -137,10 +122,21 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
 
 
   /** */
-  toRootTreeItem(lti: LinkTreeItem): TemplateResult {
-    //console.log("toRootTreeItem()", lti)
+  renderLeafAnchor(rootAnchors: TypedAnchor[]): TemplateResult<1> {
+    return html``;
+  }
+
+  /** */
+  async expandAll(): Promise<void> {
+    // FIXME
+  }
+
+
+  /** */
+  toLevel0TreeItem(lti: AnchorTreeItem): TemplateResult {
+    //console.log("toLevel0TreeItem()", lti)
     if (lti.slt == undefined) {
-      console.warn("toRootTreeItem() aborted. Missing linkIndex argument.");
+      console.warn("toLevel0TreeItem() aborted. Missing linkIndex argument.");
       return html``;
     }
     const id = "anchor__" +  lti.origin;
@@ -150,7 +146,7 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
   }
 
 
-  /** Set _rootAnchors to all anchors linking off ROOT */
+  /** Set _level0 to all children of this.rootTypedAnchor */
   async walkRootAnchor(): Promise<void> {
     if (!this._zvm) {
       console.warn("walkRootAnchor() aborted. Missing _zvm.");
@@ -173,7 +169,7 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
       tas = await this._zvm.zomeProxy.getAllRootAnchors();
     }
     console.log("TypedAnchors", tas);
-    this._level0 = tas.map((ta): LinkTreeItem => {
+    this._level0 = tas.map((ta): AnchorTreeItem => {
       return {origin: ta.anchor, slt: {zomeIndex: ta.zomeIndex, linkIndex: ta.linkIndex}}
     });
   }
@@ -181,7 +177,7 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
 
   /** */
   renderAnchorTree(title: string): TemplateResult<1> {
-    const level0Items = this._level0.map((lti) => {return this.toRootTreeItem(lti)});
+    const level0Items = this._level0.map((lti) => {return this.toLevel0TreeItem(lti)});
     //console.log({level0: level0Items});
 
     /** */
@@ -207,7 +203,6 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
     if (event.target.id.substring(0, 3) == "uhC") {
       await this.updateComplete;
       this.dispatchEvent(new CustomEvent('hashSelected', {detail: event.target.id, bubbles: true, composed: true}));
-
     }
   }
 
@@ -216,7 +211,7 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
   async toggleTreeItem(event:any) {
     const busyIndicator = this.shadowRoot!.getElementById("busy") as BusyIndicator;
     const toggledTreeItem = event.detail.item as TreeItem ; // get the node that is toggled
-    const lti = toLinkTreeItem(toggledTreeItem);
+    const lti = toAnchorTreeItem(toggledTreeItem);
     //const isTyped = !!this.root && typeof this.root == 'object';
     const isTyped = !!toggledTreeItem.getAttribute("linkIndex");
 
@@ -353,7 +348,6 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
           ${this.renderAnchorTree(title)}
         </div>
     `;
-
   }
 
 
@@ -381,4 +375,5 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
       this.rootTypedAnchor = maybeTypedAnchor[1];
     }
   }
+
 }

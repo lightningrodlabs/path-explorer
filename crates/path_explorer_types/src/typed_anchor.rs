@@ -36,6 +36,7 @@ impl TypedAnchor {
     TypedAnchor {zome_index, link_index, anchor}
   }
 
+
   /// into TypedPath
   pub fn as_path(&self) -> TypedPath {
     TypedPath {
@@ -71,7 +72,7 @@ impl TypedAnchor {
 
   /// Return all LeafAnchors from this Anchor
   /// USE WITH CARE as this can easily timeout as it's a recursive loop of get_links()
-  pub fn probe_leaf_anchors(&self) -> ExternResult<Vec<TypedAnchor>> {
+  pub fn walk(&self) -> ExternResult<Vec<TypedAnchor>> {
     let res_tps = tp_leaf_children(&self.as_path())?;
     //debug!("TypedAnchor.probe_leaf_anchors() '{}' has {} children.", self.anchor, res_tps.len());
     let res = res_tps
@@ -96,6 +97,7 @@ impl TypedAnchor {
   }
 
 }
+
 
 ///
 pub fn batch_convert_path_to_anchor(tps: Vec<TypedPath>) -> ExternResult<Vec<TypedAnchor>> {

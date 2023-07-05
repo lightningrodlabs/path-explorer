@@ -1,7 +1,7 @@
 use hdk::prelude::*;
 use zome_utils::*;
 
-
+/// LinkTypes to get
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct MyLinkFilter(pub Vec<(u8, Vec<u8>)>);
 
@@ -27,7 +27,7 @@ impl LinkTypeFilterExt for MyLinkFilter {
 #[serde(rename_all = "camelCase")]
 pub struct GetItemsInput {
   pub anchor: String, // We don't need a typedAnchor here since we care only about the ItemLink type and not the Anchor type
-  pub link_filter: MyLinkFilter, //TODO: LinkTypeFilter once defined in JS
+  pub link_filter: MyLinkFilter, //TODO: Change type ro LinkTypeFilter once holochain-client-js defines it.
   pub link_tag: Option<Vec<u8>>, // TODO: LinkTag once defined in JS
 }
 
