@@ -155,6 +155,7 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
   /** Set _rootAnchors to all anchors linking off ROOT */
   async walkRootAnchor(): Promise<void> {
     if (!this._zvm) {
+      console.warn("walkRootAnchor() aborted. Missing _zvm.");
       return;
     }
     console.debug("walkRootAnchor()", this.rootTypedAnchor);
@@ -340,8 +341,15 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
               Expand All
           </button>
           <ui5-input id="rootInput" type="Text" placeholder="root anchor"
+                     style="min-width: 400px;"
                      show-clear-icon
-                     style="min-width: 400px;"></ui5-input>            
+                     @keypress=${(event:any) => {
+                       console.log("input event", event);
+                        if (event.key === "Enter") {
+                            this.onWalkInput(event);
+                        }
+                     }}
+                     ></ui5-input>            
           <button @click=${this.onWalkInput}>Walk</button>
         <div>
           ${this.renderAnchorTree(title)}

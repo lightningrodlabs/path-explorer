@@ -99,7 +99,8 @@ export class TaskerApp extends HappElement {
     switch (this._pageDisplayIndex) {
       case 0: page = html`<tasker-page style="flex: 1;"></tasker-page>` ; break;
       case 1: page = html`<paths-dashboard .allAppEntryTypes=${this._allAppEntryTypes} style="flex: 1;"></paths-dashboard>`; break;
-      case 2: page = html`<agent-directory-list style="flex: 1;"></agent-directory-list>`; break;
+      case 2: page = html`<anchor-tree></anchor-tree>`; break;
+      case 3: page = html`<agent-directory-list style="flex: 1;"></agent-directory-list>`; break;
 
       default: page = html`unknown page index`;
     };
@@ -111,7 +112,8 @@ export class TaskerApp extends HappElement {
           <view-cell-context></view-cell-context>
           <input type="button" value="Tasker" @click=${() => {this._pageDisplayIndex = 0; this.requestUpdate()}} >
           <input type="button" value="Paths Dashboard" @click=${() => {this._pageDisplayIndex = 1; this.requestUpdate()}} >
-          <input type="button" value="Agent Directory" @click=${() => {this._pageDisplayIndex = 2; this.requestUpdate()}} >
+            <input type="button" value="Anchors" @click=${() => {this._pageDisplayIndex = 2; this.requestUpdate()}} >
+            <input type="button" value="Agent Directory" @click=${() => {this._pageDisplayIndex = 3; this.requestUpdate()}} >
         </div>
         <button type="button" @click=${this.refresh}>Refresh</button>
         <span><b>Agent:</b> ${this.taskerDvm.cell.agentPubKey}</span>

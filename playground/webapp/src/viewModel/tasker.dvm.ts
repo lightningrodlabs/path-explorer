@@ -17,7 +17,7 @@ import {ProfileDef} from "./profiles.proxy";
   static readonly DEFAULT_BASE_ROLE_NAME = "rTasker";
   static readonly ZVM_DEFS: ZvmDef[] = [
    TaskerZvm,
-   [PathExplorerZvm, "zPathExplorer"],
+   PathExplorerZvm,
    [AgentDirectoryZvm, "zAgentDirectory"],
    [ProfilesZvm, "profiles"],
   ];

@@ -142,7 +142,7 @@ import {pathExplorerFunctionNames} from './path-explorer.fn';
  *
  */
 export class PathExplorerProxy extends ZomeProxy {
-  static readonly DEFAULT_ZOME_NAME = "path-explorer"
+  static readonly DEFAULT_ZOME_NAME = "zPathExplorer"
   static readonly FN_NAMES = pathExplorerFunctionNames
  
   async getAllItemsFromAnchor(leafAnchor: string): Promise<ItemLink[]> {

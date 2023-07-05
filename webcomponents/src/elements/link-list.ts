@@ -139,7 +139,13 @@ export class LinkList extends ZomeElement<unknown, PathExplorerZvm> {
     return html`
         <h3>Links Explorer</h3>
           <label for="baseInput">Base:</label>
-          <input style="min-width: 400px;" type="text" id="baseInput" name="title">
+          <input style="min-width: 400px;" type="text" id="baseInput" name="title"
+                 @keypress=${(event:any) => {
+                  console.log("input event", event);
+                  if (event.key === "Enter") {
+                      this.onProbe(event);
+                  }
+                }}>
           <input type="button" value="Probe" @click=${this.onProbe}>
           <div style="margin-top:5px;">
               Filter by

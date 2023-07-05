@@ -31,5 +31,5 @@ export function generatePathExplorerZomeFunctionsArray(zomeName: ZomeName): [Zom
 }
 
 
-/** Tuple array of all zome function names with default zome name "path-explorer" */
-export const pathExplorerZomeFunctions: [ZomeName, FunctionName][] = generatePathExplorerZomeFunctionsArray("path-explorer");
+/** Tuple array of all zome function names with default zome name "zPathExplorer" */
+export const pathExplorerZomeFunctions: [ZomeName, FunctionName][] = generatePathExplorerZomeFunctionsArray("zPathExplorer");
