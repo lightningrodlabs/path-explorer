@@ -101,7 +101,6 @@ impl TypedAnchor {
 
 ///
 pub fn batch_convert_path_to_anchor(tps: Vec<TypedPath>) -> ExternResult<Vec<TypedAnchor>> {
-  let this_zome_index = zome_info()?.id.0;
   let mut res = Vec::new();
   for tp in tps {
     //let leaf = child_pair.1.leaf().unwrap();
@@ -113,7 +112,7 @@ pub fn batch_convert_path_to_anchor(tps: Vec<TypedPath>) -> ExternResult<Vec<Typ
         debug!("Failed to convert Path to Anchor: {:?}", tp.path);
         continue;
       };
-    res.push(TypedAnchor::new(str, this_zome_index, tp.link_type.zome_type.0));
+    res.push(TypedAnchor::new(str, tp.link_type.zome_index.0, tp.link_type.zome_type.0));
   }
   Ok(res)
 }

@@ -19,6 +19,21 @@ pub fn create_task_list(title: String) -> ExternResult<ActionHash> {
       LinkTag::from(()),
    )?;
    debug!("create_task_list() link_ah = {link_ah}");
+
+   let anchor_eh2 = Path::from("foo.2:3#barbazii")
+     .path_entry_hash()
+     .expect("TaskLists Path should hash");
+
+   /// Create complexe path for testing reasons
+   let link_ah2 = create_link(
+      anchor_eh2,
+      eh.clone(),
+      TaskerLinkType::TaskLists,
+      LinkTag::from(()),
+   )?;
+   debug!("create_task_list() link_ah2 = {link_ah2}");
+
+   /// Done
    Ok(ah)
 }
 

@@ -8,7 +8,6 @@ export const pathExplorerFunctionNames: FunctionName[] = [
 	"entry_defs", 
 	"get_zome_info", 
 	"get_dna_info",
-	"get_all_children",
 	"get_all_items_from_anchor",
 	"get_all_items",
 	"get_all_items_from_b64",

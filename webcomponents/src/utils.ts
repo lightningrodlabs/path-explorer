@@ -17,7 +17,7 @@ export function linkType2str(slt: FlatScopedLinkType): string {
 
 /** */
 export function linkType2NamedStr(slt: FlatScopedLinkType, zomeNames: ZomeName[]): string {
-  return zomeNames[slt.zomeIndex] + " | " + slt.linkIndex;
+  return `${zomeNames[slt.zomeIndex]} [${slt.zomeIndex}; ${slt.linkIndex}]`;
 }
 
 

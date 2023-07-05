@@ -145,10 +145,6 @@ export class PathExplorerProxy extends ZomeProxy {
   static readonly DEFAULT_ZOME_NAME = "zPathExplorer"
   static readonly FN_NAMES = pathExplorerFunctionNames
  
-  async getAllChildren(ta: TypedAnchor): Promise<TypedAnchor[]> {
-    return this.call('get_all_children', ta);
-  }
-
   async getAllItemsFromAnchor(leafAnchor: string): Promise<ItemLink[]> {
     return this.call('get_all_items_from_anchor', leafAnchor);
   }

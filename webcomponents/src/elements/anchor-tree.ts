@@ -19,7 +19,7 @@ import "@ui5/webcomponents/dist/features/InputSuggestions.js";
 import {Base64} from "js-base64";
 import {PathExplorerZvm} from "../viewModels/path-explorer.zvm";
 import {TypedAnchor} from "../bindings/path-explorer.types";
-import {AnyLinkableHashB64, FlatScopedLinkType, linkType2NamedStr, linkType2str} from "../utils";
+import {AnyLinkableHashB64, linkType2NamedStr, linkType2str} from "../utils";
 
 
 const ZOME_LINK_NAMES = [""]; // FIXME Get Link names somehow once Holo provides an API for that ; Object.keys(ThreadsLinkTypeType);
@@ -27,8 +27,10 @@ const ZOME_LINK_NAMES = [""]; // FIXME Get Link names somehow once Holo provides
 /** */
 export interface AnchorTreeItem {
   base: AnyLinkableHashB64 | string /* Anchor */,
+  level: number,
   isAnchor: boolean,
-  slt?: FlatScopedLinkType,
+  zomeIndex: number,
+  linkIndex: number,
 }
 
 
@@ -43,11 +45,10 @@ function toAnchorTreeItem(ti: TreeItem): AnchorTreeItem | null {
   }
   const ati = {
     base: ti.id,
+    level: ti.level,
     isAnchor: Boolean(isAnchor),
-    slt: {
-      zomeIndex: Number(zomeIndex),
-      linkIndex: Number(linkIndex),
-    }
+    zomeIndex: Number(zomeIndex),
+    linkIndex: Number(linkIndex),
   };
   //console.log("toLinkTreeItem()", ti, lti);
   return ati;
@@ -114,10 +115,10 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
   }
 
 
-  /** Probe rootAnchors at startup */
-  protected firstUpdated() {
-    this.walkRootAnchor();
-  }
+  // /** Probe rootAnchors at startup */
+  // protected firstUpdated() {
+  //   this.walkRootAnchor();
+  // }
 
 
   /** */
@@ -146,15 +147,15 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
   /** */
   toLevel0TreeItem(ati: AnchorTreeItem): TemplateResult {
     //console.log("toLevel0TreeItem()", lti)
-    if (ati.slt == undefined) {
-      console.warn("toLevel0TreeItem() aborted. Missing FlatScopedLinkType field in function argument.");
-      return html``;
-    }
-    const linkTypeName = linkType2NamedStr(ati.slt, this._zomeNames) //linkType2str(lti.slt);
+    // if (ati.slt == undefined) {
+    //   console.warn("toLevel0TreeItem() aborted. Missing FlatScopedLinkType field in function argument.");
+    //   return html``;
+    // }
+    const linkTypeName = linkType2NamedStr(ati, this._zomeNames); // linkType2str(ati);
     return html`<ui5-tree-item id="${ati.base}"
                                text="${ati.base}" additional-text=${linkTypeName}
                                has-children
-                               zomeIndex="${ati.slt.zomeIndex}" linkIndex="${ati.slt.linkIndex}" is-anchor="true"
+                               zomeIndex="${ati.zomeIndex}" linkIndex="${ati.linkIndex}" is-anchor="true"
     ></ui5-tree-item>`;
   }
 
@@ -185,8 +186,10 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
     this._level0 = tas.map((ta): AnchorTreeItem => {
       return {
         base: ta.anchor,
+        level: 0,
         isAnchor: true,
-        slt: {zomeIndex: ta.zomeIndex, linkIndex: ta.linkIndex}
+        zomeIndex: ta.zomeIndex,
+        linkIndex: ta.linkIndex,
       }
     });
   }
@@ -222,12 +225,11 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
       return;
     }
 
-    const treeItem = toAnchorTreeItem(toggledTreeItem);
-    const isTyped = !!toggledTreeItem.getAttribute("linkIndex");
-    console.log("toggleTreeItem()", treeItem, isTyped);
+    const ati = toAnchorTreeItem(toggledTreeItem);
+    console.log("toggleTreeItem()", ati);
 
     /* Make sure it's an Anchor TreeItem */
-    if (!treeItem || !treeItem.isAnchor) {
+    if (!ati || !ati.isAnchor) {
       return;
     }
 
@@ -240,20 +242,11 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
     for (const item of toggledTreeItem.items) {
       currentItemTexts.push((item as TreeItem).text);
     }
-    console.log("toggleTreeItem() currentItemTexts", currentItemTexts, isTyped);
+    console.log("toggleTreeItem() currentItemTexts", currentItemTexts);
 
     /** Grab children */
-    let children_tas: TypedAnchor[] = [];
-    if (isTyped && treeItem.base) {
-      children_tas = await this._zvm.zomeProxy.getTypedChildren({anchor: treeItem.base, zomeIndex: treeItem.slt!.zomeIndex, linkIndex: treeItem.slt!.linkIndex});
-    }
-    // else {
-    //   let linkItems = await this._zvm.zomeProxy.getAllItemsFromAnchor(lti.origin);
-    //   //any_children_tas = await this._zvm.zomeProxy.getAllChildren(lti.origin);
-    //
-    // }
+    const children_tas: TypedAnchor[] = await this._zvm.zomeProxy.getTypedChildren({anchor: ati.base, zomeIndex: ati.zomeIndex, linkIndex: ati.linkIndex});
     console.log("toggleTreeItem() children_tas", children_tas);
-
 
     /** If it has children, then it's a non-LeafAnchor, so create a TreeItem for each child Anchor */
     for (const ta of children_tas) {
@@ -263,14 +256,15 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
         continue;
       }
       let newItem = document.createElement("ui5-tree-item") as TreeItem;
+      newItem.id = ta.anchor;
       newItem.text = leafComponent;
+      //newItem.additionalText = linkType2NamedStr(ta, this._zomeNames); // linkType2str(ati);
       newItem.additionalText = ta.anchor;
       newItem.setAttribute("zomeIndex", ta.zomeIndex.toString());
       newItem.setAttribute("linkIndex", ta.linkIndex.toString());
       newItem.setAttribute("is-anchor", "true");
-      newItem.id = ta.anchor;
       newItem.hasChildren = true;
-      newItem.level = toggledTreeItem.level + 1;
+      newItem.level = ati.level + 1;
       toggledTreeItem.appendChild(newItem); // add the newly fetched node to the tree
     }
 
@@ -281,7 +275,7 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
       for (const item of toggledTreeItem.items) {
         itemHashs.push(item.id);
       }
-      const itemLinks = await this._zvm.zomeProxy.getAllItemsFromAnchor(toggledTreeItem.id);
+      const itemLinks = await this._zvm.zomeProxy.getAllItemsFromAnchor(ati.base);
       console.log({itemLinks})
       for (const itemLink of itemLinks) {
         const tag = new TextDecoder().decode(new Uint8Array(itemLink.tag));
@@ -292,15 +286,13 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
         }
         var newItem = document.createElement("ui5-tree-item") as TreeItem;
         newItem.text = hash;
+        //newItem.additionalText = linkType2NamedStr(itemLink, this._zomeNames); // linkType2str(ati);
         newItem.additionalText = tag // tag ? ZOME_LINK_NAMES[itemLink.linkIndex] + " | " + tag : ZOME_LINK_NAMES[itemLink.linkIndex];
         newItem.setAttribute("is-anchor", "false");
-        // /** Set LinkType only if it's the same, in order to determine if we reached leafItems */
-        // if (itemLink.zomeIndex.toString() == toggledTreeItem.getAttribute("zomeIndex") && itemLink.linkIndex.toString() == toggledTreeItem.getAttribute("linkIndex")) {
-        //   newItem.setAttribute("zomeIndex", itemLink.zomeIndex.toString());
-        //   newItem.setAttribute("linkIndex", itemLink.linkIndex.toString());
-        // }
+        newItem.setAttribute("zomeIndex", itemLink.zomeIndex.toString());
+        newItem.setAttribute("linkIndex", itemLink.linkIndex.toString());
         newItem.id = hash;
-        newItem.level = toggledTreeItem.level + 1;
+        newItem.level = ati.level + 1;
         toggledTreeItem.appendChild(newItem); // add the newly fetched node to the tree
       }
     }

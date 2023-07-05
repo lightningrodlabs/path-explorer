@@ -54,6 +54,8 @@ fn init_anchors(_: ()) -> ExternResult<()> {
    path1.ensure()?;
    path2.ensure()?;
    path3.ensure()?;
+   let path4 = Path::from("foo.2:3#barbazii").typed(TaskerLinkType::Path)?;
+   path4.ensure()?;
    Ok(())
 }
 
