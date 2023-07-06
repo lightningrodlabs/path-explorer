@@ -1,6 +1,5 @@
 {
   "name": "path-explorer-root",
-  "version": "0.1.0",
   "config": {
     "hc_version": "0.1.3",
     "zits_version": "1.9.0",
@@ -35,7 +34,7 @@
     "network:mdns"           : "concurrently-repeat \"npm run start:mdns\"",
     "network:hc-playground"  : "concurrently-repeat \"npm run start:hc-playground\"",
 
-    "hc-playground"          : "run-singleton \"holochain-playground\"",
+    "hc-playground"          : "holochain-playground",
 
     "clean:hc"               : "rm .hc*",
     "clean"                  : "bash scripts/clean.sh",
@@ -43,7 +42,7 @@
     "clean:all"              : "npm run clean:hc && npm run clean && npm run clean:npm"
   },
   "devDependencies": {
-    "@holochain-playground/cli": "^0.0.8",
+    "@holochain-playground/cli": "0.1.1",
     "bestzip": "^2.2.0",
     "concurrently": "^6.2.1",
     "concurrently-repeat": "^0.0.1",

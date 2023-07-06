@@ -1,7 +1,7 @@
 import {css, html, PropertyValues, TemplateResult} from "lit";
 import {property, state, customElement} from "lit/decorators.js";
 import {Cell, ScopedZomeTypes, ZomeElement} from "@ddd-qc/lit-happ";
-import {AnyDhtHashB64, encodeHashToBase64, ZomeName} from "@holochain/client";
+import {AnyDhtHashB64, decodeHashFromBase64, encodeHashToBase64, ZomeName} from "@holochain/client";
 
 
 import Tree from "@ui5/webcomponents/dist/Tree"
@@ -28,7 +28,7 @@ const ZOME_LINK_NAMES = [""]; // FIXME Get Link names somehow once Holo provides
 export interface AnchorTreeItem {
   base: AnyLinkableHashB64 | string /* Anchor */,
   level: number,
-  isAnchor: boolean,
+  type: string,
   zomeIndex: number,
   linkIndex: number,
 }
@@ -36,17 +36,17 @@ export interface AnchorTreeItem {
 
 /** */
 function toAnchorTreeItem(ti: TreeItem): AnchorTreeItem | null {
-  const isAnchor = ti.getAttribute("is-anchor");
+  const type = ti.getAttribute("tree-item-type");
   const zomeIndex = ti.getAttribute("zomeIndex");
   const linkIndex = ti.getAttribute("linkIndex");
 
-  if (!isAnchor) {
+  if (!type) {
     return null;
   }
   const ati = {
     base: ti.id,
     level: ti.level,
-    isAnchor: Boolean(isAnchor),
+    type,
     zomeIndex: Number(zomeIndex),
     linkIndex: Number(linkIndex),
   };
@@ -155,7 +155,7 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
     return html`<ui5-tree-item id="${ati.base}"
                                text="${ati.base}" additional-text=${linkTypeName}
                                has-children
-                               zomeIndex="${ati.zomeIndex}" linkIndex="${ati.linkIndex}" is-anchor="true"
+                               zomeIndex="${ati.zomeIndex}" linkIndex="${ati.linkIndex}" tree-item-type="anchor"
     ></ui5-tree-item>`;
   }
 
@@ -187,7 +187,7 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
       return {
         base: ta.anchor,
         level: 0,
-        isAnchor: true,
+        type: "anchor",
         zomeIndex: ta.zomeIndex,
         linkIndex: ta.linkIndex,
       }
@@ -229,7 +229,7 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
     console.log("toggleTreeItem()", ati);
 
     /* Make sure it's an Anchor TreeItem */
-    if (!ati || !ati.isAnchor) {
+    if (!ati || !ati.type) {
       return;
     }
 
@@ -262,7 +262,7 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
       newItem.additionalText = ta.anchor;
       newItem.setAttribute("zomeIndex", ta.zomeIndex.toString());
       newItem.setAttribute("linkIndex", ta.linkIndex.toString());
-      newItem.setAttribute("is-anchor", "true");
+      newItem.setAttribute("tree-item-type", "anchor");
       newItem.hasChildren = true;
       newItem.level = ati.level + 1;
       toggledTreeItem.appendChild(newItem); // add the newly fetched node to the tree
@@ -288,12 +288,42 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
         newItem.text = hash;
         //newItem.additionalText = linkType2NamedStr(itemLink, this._zomeNames); // linkType2str(ati);
         newItem.additionalText = tag // tag ? ZOME_LINK_NAMES[itemLink.linkIndex] + " | " + tag : ZOME_LINK_NAMES[itemLink.linkIndex];
-        newItem.setAttribute("is-anchor", "false");
+        newItem.setAttribute("tree-item-type", "item");
         newItem.setAttribute("zomeIndex", itemLink.zomeIndex.toString());
         newItem.setAttribute("linkIndex", itemLink.linkIndex.toString());
         newItem.id = hash;
+        newItem.hasChildren = true;
         newItem.level = ati.level + 1;
-        toggledTreeItem.appendChild(newItem); // add the newly fetched node to the tree
+
+        /** Grab Link Info */
+        const linkInfo = await this._zvm.zomeProxy.inspectLink(decodeHashFromBase64(hash));
+        console.log("toggleTreeItem() linkInfo", linkInfo);
+
+        var infoItem = document.createElement("ui5-tree-item") as TreeItem;
+
+        if (linkInfo.maybeEntryDef) {
+          try {
+            const [zomeName, entryName] = await this._zvm.getEntryInfo(linkInfo.maybeEntryDef.zome_index, linkInfo.maybeEntryDef.entry_index);
+            infoItem.text = "Type: " + entryName + " | " + zomeName;
+          } catch(e) {
+            infoItem.text = "Error: " + e;
+          }
+        } else {
+          infoItem.text = "Type: " + linkInfo.info;
+        }
+        infoItem.additionalText = linkInfo.linkType;
+        infoItem.id = "info_" + hash;
+        infoItem.setAttribute("tree-item-type", "info");
+        newItem.appendChild(infoItem);
+
+        var authorItem = document.createElement("ui5-tree-item") as TreeItem;
+        authorItem.text = "Author: " + linkInfo.author;
+        //authorItem.additionalText = itemInfo.linkType;
+        authorItem.id = "author_" + hash;
+        newItem.appendChild(authorItem);
+
+        /** */
+        toggledTreeItem.appendChild(newItem);
       }
     }
 

@@ -131,8 +131,7 @@ export class LinkList extends ZomeElement<unknown, PathExplorerZvm> {
 
     if (linkInfo.maybeEntryDef) {
       try {
-        const zomeName = await this._zvm.getZomeName(linkInfo.maybeEntryDef.zome_index);
-        const entryName = await this._zvm.getEntryName(zomeName, linkInfo.maybeEntryDef.entry_index);
+        const [zomeName, entryName] = await this._zvm.getEntryInfo(linkInfo.maybeEntryDef.zome_index, linkInfo.maybeEntryDef.entry_index);
         newItem.text = "Type: " + entryName + " | " + zomeName;
       } catch(e) {
         newItem.text = "Error: " + e;

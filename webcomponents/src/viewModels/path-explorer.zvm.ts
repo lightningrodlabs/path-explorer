@@ -46,4 +46,12 @@ export class PathExplorerZvm extends ZomeViewModel {
     const entryDefs = await this.zomeProxy.callEntryDefs(zomeName);
     return entryDefs[entryIndex][0];
   }
+
+
+  /** */
+  async getEntryInfo(zomeIndex: number, entryIndex: number): Promise<[ZomeName, string]> {
+    const zomeName = await this.getZomeName(zomeIndex);
+    const entryName = await this.getEntryName(zomeName, entryIndex);
+    return [zomeName, entryName];
+  }
 }

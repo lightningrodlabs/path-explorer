@@ -221,7 +221,7 @@ export class TaskerPage extends DnaElement<unknown, TaskerDvm> {
     }
     return html`
       <div>
-        <h1>Tasker: Membranes playground</h1>
+        <h1>Tasker</h1>
         <span id="responseSpan"><b>My Roles:</b> ${myRolesStr}</span>
         <ul>${listEntryLi}</ul>
           <label for="listTitleInput">New list:</label>
