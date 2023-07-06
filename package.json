@@ -52,7 +52,15 @@
     "run-singleton-cli": "^0.0.5",
     "json-parse-better-errors": "^1.0.2"
   },
-  "engines": {
+  "dependencies": {
+    "@ddd-qc/cell-proxy"            : "0.19.4",
+    "@ddd-qc/lit-happ"              : "0.19.4",
+    "@holochain-open-dev/core-types": "0.6.3",
+    "@holochain/client"             : "=0.14.1",
+    "@lit-labs/context"             : "0.2.0",
+    "lit"                           : "2.6.0"
+  },
+    "engines": {
     "npm": ">=7.0.0"
   }
 }

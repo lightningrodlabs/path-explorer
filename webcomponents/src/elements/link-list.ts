@@ -4,11 +4,13 @@ import {ScopedZomeTypes, ZomeElement} from "@ddd-qc/lit-happ";
 import {AnyDhtHashB64, decodeHashFromBase64, encodeHashToBase64, ZomeName} from "@holochain/client";
 import {ItemLink} from '../bindings/deps.types';
 
-import "@ui5/webcomponents/dist/Tree.js"
-import "@ui5/webcomponents/dist/TreeItem.js";
-import "@ui5/webcomponents/dist/BusyIndicator.js";
+import Tree from "@ui5/webcomponents/dist/Tree"
+import TreeItem from "@ui5/webcomponents/dist/TreeItem";
+import BusyIndicator from "@ui5/webcomponents/dist/BusyIndicator";
+
 import {PathExplorerZvm} from "../viewModels/path-explorer.zvm";
 import {linkType2NamedStr, linkType2str, utf32Decode} from "../utils";
+import {TypedAnchor} from "../bindings/path-explorer.types";
 
 
 /**
@@ -86,7 +88,7 @@ export class LinkList extends ZomeElement<unknown, PathExplorerZvm> {
         const hash = encodeHashToBase64(new Uint8Array(ll.itemHash));
         const linkTypeStr = linkType2NamedStr(ll, this._zomeNames); // linkType2str(ll);
         const additionalText = tag? linkTypeStr + " | " + tag : linkTypeStr;
-        return html`<ui5-tree-item id="${hash}" text="${hash}" additional-text="${additionalText}"></ui5-tree-item>`
+        return html`<ui5-tree-item id="${hash}" text="${hash}" additional-text="${additionalText}" has-children></ui5-tree-item>`
       });
     console.log({children})
     const header = `Viewing "${this.base? this.base : "none"}"`;
@@ -94,11 +96,66 @@ export class LinkList extends ZomeElement<unknown, PathExplorerZvm> {
     return html`
       <ui5-busy-indicator id="busy" style="width: 100%">
         <ui5-tree id="linkTree"
-                  header-text=${header} no-data-text="No links found">
+                  header-text=${header} no-data-text="No links found"
+                  @item-toggle="${this.toggleTreeItem}"
+        >
           ${children}
         </ui5-tree>
       </ui5-busy-indicator>
     `
+  }
+
+
+  /** onToggle fetch the info on the toggled item */
+  async toggleTreeItem(event:any) {
+    const busyIndicator = this.shadowRoot!.getElementById("busy") as BusyIndicator;
+    const toggledTreeItem = event.detail.item as TreeItem; // get the node that is toggled
+
+    console.log("toggleTreeItem()", toggledTreeItem);
+
+    /** Bail if info already fetched */
+    if (toggledTreeItem.items.length > 0) {
+      return
+    }
+
+    /** Lock Tree */
+    event.preventDefault();
+    busyIndicator.active = true;
+
+
+    /** Grab Link Info */
+    const linkInfo = await this._zvm.zomeProxy.inspectLink(decodeHashFromBase64(toggledTreeItem.id));
+    console.log("toggleTreeItem() linkInfo", linkInfo);
+
+    var newItem = document.createElement("ui5-tree-item") as TreeItem;
+
+    if (linkInfo.maybeEntryDef) {
+      try {
+        const zomeName = await this._zvm.getZomeName(linkInfo.maybeEntryDef.zome_index);
+        const entryName = await this._zvm.getEntryName(zomeName, linkInfo.maybeEntryDef.entry_index);
+        newItem.text = "Type: " + entryName + " | " + zomeName;
+      } catch(e) {
+        newItem.text = "Error: " + e;
+      }
+    } else {
+      newItem.text = "Type: " + linkInfo.info;
+    }
+    newItem.additionalText = linkInfo.linkType;
+    newItem.id = "info_" + toggledTreeItem.id;
+    newItem.level = toggledTreeItem.level + 1;
+    toggledTreeItem.appendChild(newItem);
+
+
+    var authorItem = document.createElement("ui5-tree-item") as TreeItem;
+    authorItem.text = "Author: " + linkInfo.author;
+    //authorItem.additionalText = itemInfo.linkType;
+    authorItem.id = "author_" + toggledTreeItem.id;
+    authorItem.level = toggledTreeItem.level + 1;
+    toggledTreeItem.appendChild(authorItem);
+
+    /** Toggle and unlock Tree */
+    toggledTreeItem.toggle();
+    busyIndicator.active = false;
   }
 
 
@@ -126,6 +183,7 @@ export class LinkList extends ZomeElement<unknown, PathExplorerZvm> {
   onProbe(e:any) {
     const input = this.shadowRoot!.getElementById("baseInput") as HTMLInputElement;
     this.base = input.value;
+    this._itemLinks = [];
   }
 
 

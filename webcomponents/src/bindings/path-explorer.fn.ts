@@ -16,6 +16,7 @@ export const pathExplorerFunctionNames: FunctionName[] = [
 	"get_leafs",
 	"get_typed_anchor",
 	"get_typed_children",
+	"inspect_link",
 
 
 	"get_agent_entry_hash",];

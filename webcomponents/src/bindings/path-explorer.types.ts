@@ -154,3 +154,10 @@ export interface GetItemsInput {
   linkFilter: MyLinkFilter
   linkTag?: number[]
 }
+
+export interface HashInfo {
+  linkType: string
+  info: string
+  author: string
+  maybeEntryDef?: AppEntryDef
+}
