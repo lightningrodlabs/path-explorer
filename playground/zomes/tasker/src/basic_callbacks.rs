@@ -54,8 +54,19 @@ fn init_anchors(_: ()) -> ExternResult<()> {
    path1.ensure()?;
    path2.ensure()?;
    path3.ensure()?;
+
    let path4 = Path::from("foo.2:3#barbazii").typed(TaskerLinkType::Path)?;
    path4.ensure()?;
+
+   let external = AnyLinkableHash::from(ExternalHash::from_raw_36(path4.path_entry_hash()?.get_raw_36().to_vec()));
+
+   let _link_ah = create_link(
+      path4.path_entry_hash()?,
+      external,
+      TaskerLinkType::TaskLists,
+      LinkTag::from(()),
+   )?;
+
    Ok(())
 }
 
