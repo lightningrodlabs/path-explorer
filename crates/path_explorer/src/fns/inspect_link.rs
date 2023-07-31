@@ -24,8 +24,8 @@ pub fn inspect_link(any: AnyLinkableHash) -> ExternResult<HashInfo> {
         maybe_entry_def: None,
       }
     },
-    hash_type::AnyLinkable::Action => return inspect_ah(ActionHash::try_from(any).unwrap()),
-    hash_type::AnyLinkable::Entry => return inspect_eh(EntryHash::try_from(any).unwrap()),
+    hash_type::AnyLinkable::Action => return inspect_ah(ActionHash::from(any)),
+    hash_type::AnyLinkable::Entry => return inspect_eh(EntryHash::from(any)),
   };
   Ok(info)
 }
