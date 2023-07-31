@@ -31,7 +31,7 @@ pub fn get_list_items(list_eh: EntryHash) -> ExternResult<Vec<(EntryHash, TaskIt
    //debug!("item_links() item_links.len = {}", item_links.len());
    let mut result = Vec::new();
    for link in item_links.into_iter() {
-      let item_eh: EntryHash = link.target.into();
+      let item_eh: EntryHash = EntryHash::try_from(link.target).expect("Should be an EntryHash");
       let Some((item, is_complete)) = get_task_item(item_eh.clone())?
       else {
          continue;
@@ -55,7 +55,7 @@ pub fn get_all_lists(_: ()) -> ExternResult<Vec<(EntryHash, TaskList)>> {
    let link_pairs= zome_utils::get_typed_from_links::<TaskList>(anchor, TaskerLinkType::TaskLists, None)?;
    debug!("get_all_lists() link_pairs.len() = {:?}", link_pairs.len());
    let list_pairs: Vec<(EntryHash, TaskList)> = link_pairs.into_iter().map(|(list, link)| {
-      let list_eh: EntryHash = link.target.into();
+      let list_eh: EntryHash = EntryHash::try_from(link.target).expect("Should be an EntryHash");
       (list_eh, list)
    }).collect();
    /// Done
