@@ -78,9 +78,9 @@ fn post_commit(_signedActionList: Vec<SignedActionHashed>) {
 }
 
 
-/// Zome Callback
-#[hdk_extern]
-fn validate(_op: Op) -> ExternResult<ValidateCallbackResult> {
-   // fixme
-   Ok(ValidateCallbackResult::Valid)
-}
+// /// Zome Callback
+// #[hdk_extern]
+// fn validate(_op: Op) -> ExternResult<ValidateCallbackResult> {
+//    // fixme
+//    Ok(ValidateCallbackResult::Valid)
+// }

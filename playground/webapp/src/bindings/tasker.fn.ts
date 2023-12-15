@@ -10,7 +10,6 @@ export const taskerFunctionNames: FunctionName[] = [
 	"get_dna_info",
 
 
-
 	"create_task_list",
 	"create_task_item",
 	"complete_task",

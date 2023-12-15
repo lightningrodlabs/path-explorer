@@ -48,10 +48,10 @@
     "run-singleton-cli": "^0.0.5"
   },
   "dependencies": {
-    "@ddd-qc/cell-proxy": "0.20.0",
-    "@ddd-qc/lit-happ": "0.20.0",
+    "@ddd-qc/cell-proxy": "0.20.8",
+    "@ddd-qc/lit-happ": "0.20.8",
     "@holochain-open-dev/core-types": "0.7.0",
-    "@holochain/client": "=0.16.2",
+    "@holochain/client": "=0.16.7",
     "@lit-labs/context": "0.5.1",
     "lit": "3.0.2"
   },
