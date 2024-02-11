@@ -33,6 +33,7 @@ NetworkInfo,
 FetchPoolInfo,
 /** hdk/action.ts */
 SignedActionHashed,
+RegisterAgentActivity,
 ActionHashed,
 ActionType,
 Action,
@@ -53,6 +54,7 @@ CapClaim,
 GrantedFunctionsType,
 GrantedFunctions,
 ZomeCallCapGrant,
+CapAccessType,
 CapAccess,
 CapGrant,
 ///** hdk/countersigning.ts */
@@ -80,6 +82,15 @@ Entry,
 /** hdk/record.ts */
 Record as HcRecord,
 RecordEntry as HcRecordEntry,
+/** hdk/link.ts */
+AnyLinkableHash,
+ZomeIndex,
+LinkType,
+LinkTag,
+RateWeight,
+RateBucketId,
+RateUnits,
+Link,
 /** api/admin/types.ts */
 InstalledAppInfoStatus,
 DeactivationReason,
@@ -115,6 +126,8 @@ ZomeLocation,
 import {
 /** Common */
 DhtOpHashB64,
+//DnaHashB64, (duplicate)
+//AnyDhtHashB64, (duplicate)
 DhtOpHash,
 /** DnaFile */
 DnaFile,
@@ -149,11 +162,11 @@ export class PathExplorerProxy extends ZomeProxy {
     return this.call('get_all_items_from_anchor', leafAnchor);
   }
 
-  async getAllItems(hash: Uint8Array): Promise<ItemLink[]> {
+  async getAllItems(hash: AnyLinkableHash): Promise<ItemLink[]> {
     return this.call('get_all_items', hash);
   }
 
-  async getAllItemsFromB64(b64: Uint8Array): Promise<ItemLink[]> {
+  async getAllItemsFromB64(b64: string): Promise<ItemLink[]> {
     return this.call('get_all_items_from_b64', b64);
   }
 
@@ -177,13 +190,13 @@ export class PathExplorerProxy extends ZomeProxy {
     return this.call('get_typed_children', parentTa);
   }
 
-  async inspectLink(any: Uint8Array): Promise<HashInfo> {
+  async inspectLink(any: AnyLinkableHash): Promise<HashInfo> {
     return this.call('inspect_link', any);
   }
 
 
 
-  async getAgentEntryHash(): Promise<Uint8Array> {
+  async getAgentEntryHash(): Promise<AnyLinkableHash> {
     return this.call('get_agent_entry_hash', null);
   }
 }
