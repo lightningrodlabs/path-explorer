@@ -1,4 +1,4 @@
-use hdk::hash_path::path::{root_hash};
+use hdi::hash_path::path::{root_hash};
 use hdk::prelude::*;
 use zome_utils::*;
 use path_explorer_types::*;
@@ -9,11 +9,11 @@ use path_explorer_types::*;
 #[hdk_extern]
 pub fn get_all_root_anchors(_ : ()) -> ExternResult<Vec<TypedAnchor>> {
   /// Check for links on all link types
-  let links = get_links(
+  let links = get_links(link_input(
     root_hash()?,
     LinkTypeFilter::Dependencies(dna_zomes()), // LinkTypeFilter::single_type(zome_index, link_type)
     None, //Some(self.make_tag()?),
-  )?;
+  ))?;
   let mut res = Vec::new();
   for link in links {
     let Ok(str) = compTag2str(&link.tag)

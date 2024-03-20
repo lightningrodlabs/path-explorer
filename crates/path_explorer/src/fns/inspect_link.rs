@@ -33,7 +33,7 @@ pub fn inspect_link(any: AnyLinkableHash) -> ExternResult<HashInfo> {
 
 ///
 pub fn inspect_eh(eh: EntryHash) -> ExternResult<HashInfo> {
-  let maybe = get(eh, GetOptions::content())?;
+  let maybe = get(eh, GetOptions::network())?;
   let Some(record) = maybe
     else { return Ok(HashInfo {
       link_type: "Entry".to_string(),
@@ -61,7 +61,7 @@ pub fn inspect_eh(eh: EntryHash) -> ExternResult<HashInfo> {
 
 ///
 pub fn inspect_ah(ah: ActionHash) -> ExternResult<HashInfo> {
-  let maybe = get(ah, GetOptions::content())?;
+  let maybe = get(ah, GetOptions::network())?;
   let Some(record) = maybe
     else { return Ok(HashInfo {
       link_type: "Action".to_string(),

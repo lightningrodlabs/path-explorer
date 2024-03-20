@@ -7,12 +7,12 @@
 mod typed_anchor;
 
 pub use typed_anchor::*;
-
+use zome_utils::*;
 
 //--------------------------------------------------------------------------------------------------
 
 use hdk::prelude::*;
-use zome_utils::*;
+//use zome_utils::*;
 
 
 /// Only gives values for current integrity zome.
@@ -42,11 +42,11 @@ pub fn all_dna_link_types() -> LinkTypeFilter {
 
 /// Return all children of any link-type
 pub fn get_any_children(parent_path: Path, link_tag: Option<LinkTag>) -> ExternResult<Vec<Link>> {
-  let mut children = get_links(
+  let mut children = get_links(link_input(
     parent_path.path_entry_hash()?,
     all_dna_link_types(),
     link_tag,
-  )?;
+  ))?;
   /// Only need one of each hash.
   children.sort_unstable_by(|a, b| a.tag.cmp(&b.tag));
   children.dedup_by(|a, b| a.tag.eq(&b.tag));

@@ -1,4 +1,4 @@
-use hdk::hash_path::path::Component;
+use hdi::hash_path::path::Component;
 use hdk::prelude::*;
 use hdk::prelude::holo_hash::EntryHashB64;
 use crate::fns::get_all_root_anchors;

@@ -165,7 +165,7 @@ export type MyLinkFilter = [number, number[]][];
 export interface GetItemsInput {
   anchor: string
   linkFilter: MyLinkFilter
-  linkTag?: number[]
+  linkTag?: LinkTag
 }
 
 export interface HashInfo {

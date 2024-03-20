@@ -91,7 +91,7 @@ impl TypedAnchor {
 
 
   /// Return Items hanging off this Anchor according to filter and tag
-  pub fn get_items(&self, link_filter: impl LinkTypeFilterExt, link_tag: Option<LinkTag>) -> ExternResult<Vec<ItemLink>> {
+  pub fn get_items(&self, link_filter: LinkTypeFilter, link_tag: Option<LinkTag>) -> ExternResult<Vec<ItemLink>> {
     let tp = self.as_path();
     return get_itemlinks(tp.path, link_filter, link_tag);
   }
