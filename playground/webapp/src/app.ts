@@ -4,8 +4,6 @@ import {AdminWebsocket, AgentPubKeyB64, DnaDefinition, RoleName} from "@holochai
 import {
   HvmDef, HappElement, HCL, delay, Cell
 } from "@ddd-qc/lit-happ";
-import {TaskerPage} from "./elements/tasker-page";
-import {AgentDirectoryList} from "@ddd-qc/agent-directory";
 import "@ddd-qc/path-explorer";
 import { TaskerDvm } from "./viewModel/tasker.dvm";
 import {ProfileDef} from "./viewModel/profiles.proxy";
@@ -20,7 +18,7 @@ export class TaskerApp extends HappElement {
 
   /** Ctor */
   constructor() {
-    super(Number(process.env.HC_PORT));
+    super(Number(process.env.HC_PORT)); // FIXME add adminUrl
   }
 
   /** HvmDef */

@@ -2,6 +2,7 @@
 
 import {GetItemsInput, HashInfo, MyLinkFilter, TypedAnchor, } from './path-explorer.types';
 import {
+WebsocketConnectionOptions,
 /** types.ts */
 HoloHash,
 AgentPubKey,

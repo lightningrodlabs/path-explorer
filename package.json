@@ -2,8 +2,8 @@
   "name": "path-explorer-root",
   "version": "0.4.0",
   "config": {
-    "hc_version": "0.3.0-beta-dev.40",
-    "zits_version": "1.12.0",
+    "hc_version": "0.4.0-dev.4",
+    "zits_version": "1.14.0",
     "bin": "bin"
   },
   "workspaces": [
@@ -47,10 +47,10 @@
     "run-singleton-cli": "^0.0.5"
   },
   "dependencies": {
-    "@ddd-qc/cell-proxy": "0.23.0",
-    "@ddd-qc/lit-happ": "0.23.0",
+    "@ddd-qc/cell-proxy": "0.24.0",
+    "@ddd-qc/lit-happ": "0.24.0",
     "@holochain-open-dev/core-types": "0.7.0",
-    "@holochain/client": "^0.17.0-dev.3",
+    "@holochain/client": "^0.18.0-dev.1",
     "@lit-labs/context": "0.5.1",
     "lit": "3.0.2"
   },

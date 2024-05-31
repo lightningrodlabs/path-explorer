@@ -2,6 +2,7 @@
 
 import {TaskerEntry, TaskerLinkType, CreateTaskItemInput, TaskItem, TaskList, } from './tasker.types';
 import {
+WebsocketConnectionOptions,
 /** types.ts */
 HoloHash,
 AgentPubKey,
