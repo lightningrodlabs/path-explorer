@@ -1,6 +1,6 @@
 import {css, html} from "lit";
 import {property, state, customElement} from "lit/decorators.js";
-import { DnaElement } from "@ddd-qc/lit-happ";
+import {AgentId, DnaElement} from "@ddd-qc/lit-happ";
 import { TaskerDvm } from "../viewModel/tasker.dvm";
 import {TaskerPerspective, TaskListMaterialized} from "../viewModel/tasker.perspective";
 import {AgentPubKeyB64, encodeHashToBase64, EntryHashB64} from "@holochain/client";
@@ -145,7 +145,7 @@ export class TaskerPage extends DnaElement<unknown, TaskerDvm> {
 
     let taskListEntries = this._dvm.taskerZvm.perspective.taskListEntries;
     console.log("<tasker-page.render()> render() taskListEntries", taskListEntries);
-    let agents: AgentPubKeyB64[] = this._dvm.AgentDirectoryZvm.perspective.agents;
+    let agents: AgentId[] = this._dvm.AgentDirectoryZvm.perspective.agents;
     let myRoles = this._dvm.taskerZvm.perspective.myRoles;
     let maybeSelectedList: TaskListMaterialized | undefined = undefined;
     if (this._selectedListEh !== undefined) {
@@ -173,10 +173,10 @@ export class TaskerPage extends DnaElement<unknown, TaskerDvm> {
       }
     )
 
-    const AgentOptions = Object.entries(agents).map(
-        ([index, agentIdB64]) => {
+    const AgentOptions = Object.values(agents).map(
+        (agentId) => {
           //console.log("" + index + ". " + agentIdB64)
-          return html `<option value="${agentIdB64}">${agentIdB64.substring(0, 12)}</option>`
+          return html `<option value=${agentId}>${agentId.short}</option>`
         }
     )
 

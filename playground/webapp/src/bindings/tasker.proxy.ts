@@ -157,7 +157,6 @@ export class TaskerProxy extends ZomeProxy {
   static readonly FN_NAMES = taskerFunctionNames
  
 
-
   async createTaskList(title: string): Promise<ActionHash> {
     return this.call('create_task_list', title);
   }

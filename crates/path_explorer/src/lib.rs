@@ -1,11 +1,4 @@
-#![allow(non_upper_case_globals)]
-#![allow(unused_doc_comments)]
-#![allow(non_camel_case_types)]
-#![allow(non_snake_case)]
-#![allow(unused_attributes)]
-
 mod fns;
-mod utils;
-mod zfn;
+mod common_zfns;
 
-pub use utils::*;
+pub use fns::*;

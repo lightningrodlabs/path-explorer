@@ -2,24 +2,6 @@ use hdk::prelude::*;
 #[allow(unused_imports)]
 use tasker_model::*;
 
-use std::collections::BTreeSet;
-
-/// Setup initial capabilities
-//#[hdk_extern]
-fn init_caps(_: ()) -> ExternResult<()> {
-   //let /*mut*/ functions: GrantedFunctions = BTreeSet::new();
-   //functions.insert((zome_info()?.name, REMOTE_ENDPOINT.into()));
-   create_cap_grant(
-      CapGrantEntry {
-         tag: "".into(),
-         access: ().into(), // empty access converts to unrestricted
-         functions: hdk::prelude::GrantedFunctions::Listed(BTreeSet::new()),
-         //functions,
-      }
-   )?;
-   Ok(())
-}
-
 
 /// Setup
 #[hdk_extern]
@@ -39,7 +21,6 @@ fn init(_: ()) -> ExternResult<InitCallbackResult> {
 
 ///
 fn init_inner() -> ExternResult<InitCallbackResult> {
-   init_caps(())?;
    init_anchors(())?;
    Ok(InitCallbackResult::Pass)
 }
@@ -71,16 +52,8 @@ fn init_anchors(_: ()) -> ExternResult<()> {
 }
 
 
-/// Zome Callback
-#[hdk_extern(infallible)]
-fn post_commit(_signedActionList: Vec<SignedActionHashed>) {
-   // n/a
-}
-
-
-// /// Zome Callback
-// #[hdk_extern]
-// fn validate(_op: Op) -> ExternResult<ValidateCallbackResult> {
-//    // fixme
-//    Ok(ValidateCallbackResult::Valid)
+// ///
+// #[hdk_extern(infallible)]
+// fn post_commit(_signedActionList: Vec<SignedActionHashed>) {
+//    // n/a
 // }

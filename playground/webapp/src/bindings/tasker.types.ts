@@ -174,9 +174,7 @@ export interface TaskItem {
 }
 
 /** List of all Link types handled by this Zome */
-export type TaskerLinkType =
-  | {Default: null} | {Path: null} | {TaskLists: null} | {Locked: null} | {Completed: null} | {Item: null};
-export enum TaskerLinkTypeType {
+export enum TaskerLinkType {
 	Default = 'Default',
 	Path = 'Path',
 	TaskLists = 'TaskLists',

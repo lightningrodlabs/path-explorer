@@ -159,6 +159,12 @@ export class PathExplorerProxy extends ZomeProxy {
   static readonly DEFAULT_ZOME_NAME = "zPathExplorer"
   static readonly FN_NAMES = pathExplorerFunctionNames
  
+
+
+  async getAgentEntryHash(): Promise<AnyLinkableHash> {
+    return this.call('get_agent_entry_hash', null);
+  }
+
   async getAllItemsFromAnchor(leafAnchor: string): Promise<ItemLink[]> {
     return this.call('get_all_items_from_anchor', leafAnchor);
   }
@@ -193,11 +199,5 @@ export class PathExplorerProxy extends ZomeProxy {
 
   async inspectLink(any: AnyLinkableHash): Promise<HashInfo> {
     return this.call('inspect_link', any);
-  }
-
-
-
-  async getAgentEntryHash(): Promise<AnyLinkableHash> {
-    return this.call('get_agent_entry_hash', null);
   }
 }
