@@ -1,12 +1,13 @@
 import { html } from "lit";
-import {property, state} from "lit/decorators.js";
+import {state} from "lit/decorators.js";
 import {AdminWebsocket, AppWebsocket, DnaDefinition, InstalledAppId, RoleName} from "@holochain/client";
 import {
-  HvmDef, HappElement, HCL, delay, Cell, AgentId
+  HvmDef, HappElement, HCL, Cell,
 } from "@ddd-qc/lit-happ";
 import "@ddd-qc/path-explorer";
 import { TaskerDvm } from "./viewModel/tasker.dvm";
 import {Profile} from "@ddd-qc/profiles-dvm";
+import {Dictionary, EntryDef} from "@ddd-qc/cell-proxy";
 
 
 
@@ -17,24 +18,25 @@ export class TaskerApp extends HappElement {
 
   // /** Ctor */
   // constructor() {
-  //   super(Number(process.env.HC_PORT)); // FIXME add adminUrl
+  //   super(Number(process.env.HC_APP_PORT)); // FIXME add adminUrl
   // }
 
   /** All arguments should be provided when constructed explicity */
+  /** @ts-ignore */
   constructor(appWs?: AppWebsocket, private _adminWs?: AdminWebsocket, readonly appId?: InstalledAppId) {
     /** Figure out arguments for super() */
-    const appPort: number = Number(process.env.HC_PORT);
+    const appPort: number = Number(process.env.HC_APP_PORT);
     const adminUrl = _adminWs
       ? undefined
-      : process.env.ADMIN_PORT
-        ? new URL(`ws://localhost:${process.env.ADMIN_PORT}`)
+      : process.env.HC_ADMIN_PORT
+        ? new URL(`ws://localhost:${process.env.HC_ADMIN_PORT}`)
         : undefined;
     super(appWs? appWs : appPort, appId, adminUrl);
   }
 
 
   /** HvmDef */
-  static readonly HVM_DEF: HvmDef = {
+  static override readonly HVM_DEF: HvmDef = {
     id: "hTasker",
     dvmDefs: [{ctor: TaskerDvm, isClonable: true}],
   };
@@ -50,7 +52,7 @@ export class TaskerApp extends HappElement {
 
   private _pageDisplayIndex: number = 0;
   /** ZomeName -> (AppEntryDefName, isPublic) */
-  private _allAppEntryTypes: Record<string, [string, boolean][]> = {};
+  private _allAppEntryTypes: Dictionary<Dictionary<EntryDef>> = {};
 
 
   @state() private _cell?: Cell;
@@ -59,15 +61,15 @@ export class TaskerApp extends HappElement {
   private _dnaDef?: DnaDefinition;
 
   /** */
-  async hvmConstructed() {
+  override async hvmConstructed() {
     console.log("hvmConstructed()")
     //new ContextProvider(this, cellContext, this.taskerDvm.cell);
     /** Authorize all zome calls */
-    const adminWs = await AdminWebsocket.connect({url: new URL(`ws://localhost:${process.env.ADMIN_PORT}`)});
+    const adminWs = await AdminWebsocket.connect({url: new URL(`ws://localhost:${process.env.HC_ADMIN_PORT}`)});
     console.log({adminWs});
     await this.hvm.authorizeAllZomeCalls(adminWs);
     console.log("*** Zome call authorization complete");
-    this._dnaDef = await adminWs.getDnaDefinition(this.taskerDvm.cell.id[0]);
+    this._dnaDef = await adminWs.getDnaDefinition(this.taskerDvm.cell.address.dnaId.hash);
     console.log("happInitialized() dnaDef", this._dnaDef);
     /** Probe */
     this._cell = this.taskerDvm.cell;
@@ -96,12 +98,12 @@ export class TaskerApp extends HappElement {
 
 
   /** */
-  render() {
+  override render() {
     console.log("*** <tasker-app> render()", this._loaded, this.taskerDvm.pathExplorerZvm.perspective)
     if (!this._loaded) {
       return html`<span>Loading...</span>`;
     }
-    let knownAgents: AgentId[] = this.taskerDvm.AgentDirectoryZvm.perspective.agents;
+    //let knownAgents: AgentId[] = this.taskerDvm.AgentDirectoryZvm.perspective.agents;
     //console.log({coordinator_zomes: this._dnaDef?.coordinator_zomes})
     const zomeNames = this._dnaDef?.coordinator_zomes.map((zome) => { return zome[0]; });
     console.log({zomeNames})
@@ -126,7 +128,7 @@ export class TaskerApp extends HappElement {
             <input type="button" value="Agent Directory" @click=${() => {this._pageDisplayIndex = 3; this.requestUpdate()}} >
         </div>
         <button type="button" @click=${this.refresh}>Refresh</button>
-        <span><b>Agent:</b> ${this.taskerDvm.cell.agentId}</span>
+        <span><b>Agent:</b> ${this.taskerDvm.cell.address.agentId.b64}</span>
         <hr class="solid">      
         ${page}
       </cell-context>        

@@ -34,8 +34,8 @@
     "typescript": "~5.2.0"
   },
   "dependencies": {
-    "@ddd-qc/agent-directory": "6.5.0",
-    "@ddd-qc/profiles-dvm": "0.25.0",
+    "@ddd-qc/agent-directory": "6.8.0",
+    "@ddd-qc/profiles-dvm": "0.29.0",
     "@ddd-qc/path-explorer": "file:../../webcomponents"
   }
 }

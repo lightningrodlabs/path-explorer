@@ -1,10 +1,9 @@
 import {css, html, PropertyValues, TemplateResult} from "lit";
 import {property, state, customElement} from "lit/decorators.js";
-import {Cell, ScopedZomeTypes, ZomeElement} from "@ddd-qc/lit-happ";
-import {AnyDhtHashB64, decodeHashFromBase64, encodeHashToBase64, ZomeName} from "@holochain/client";
+import {ScopedZomeTypes, ZomeElement} from "@ddd-qc/lit-happ";
+import {decodeHashFromBase64, encodeHashToBase64, ZomeName} from "@holochain/client";
 
 
-import Tree from "@ui5/webcomponents/dist/Tree"
 import TreeItem from "@ui5/webcomponents/dist/TreeItem";
 import BusyIndicator from "@ui5/webcomponents/dist/BusyIndicator";
 import "@ui5/webcomponents/dist/Tree.js"
@@ -16,13 +15,12 @@ import Input from "@ui5/webcomponents/dist/Input";
 import "@ui5/webcomponents/dist/Input.js";
 import "@ui5/webcomponents/dist/features/InputSuggestions.js";
 
-import {Base64} from "js-base64";
 import {PathExplorerZvm} from "../viewModels/path-explorer.zvm";
 import {TypedAnchor} from "../bindings/path-explorer.types";
-import {AnyLinkableHashB64, linkType2NamedStr, linkType2str} from "../utils";
+import {AnyLinkableHashB64, linkType2NamedStr} from "../utils";
 
 
-const ZOME_LINK_NAMES = [""]; // FIXME Get Link names somehow once Holo provides an API for that ; Object.keys(ThreadsLinkTypeType);
+//const ZOME_LINK_NAMES = [""]; // FIXME Get Link names somehow once Holo provides an API for that ; Object.keys(ThreadsLinkTypeType);
 
 /** */
 export interface AnchorTreeItem {
@@ -64,7 +62,7 @@ function getLeafComponent(anchor: String): string {
   }
   console.log("leafComponent()", anchor, subs)
   if (subs.length == 0) {return "<error>"}
-  return subs[subs.length - 1];
+  return subs[subs.length - 1]!;
 }
 
 
@@ -102,10 +100,15 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
   // TODO: Add refresh buttons to branch items
 
 
+  /** -- Getters -- */
+
+  get linkTypes() {return this._linkTypes}
+
+
   /** -- Methods -- */
 
   /** */
-  protected async zvmUpdated(newZvm: PathExplorerZvm, oldZvm?: PathExplorerZvm): Promise<void> {
+  protected override async zvmUpdated(newZvm: PathExplorerZvm, oldZvm?: PathExplorerZvm): Promise<void> {
     console.log("<anchor-tree>.zvmUpdated()", newZvm, oldZvm);
     const zi = await newZvm.zomeProxy.zomeInfo();
     //console.log("<anchor-tree>.zvmUpdated()" zi);
@@ -122,7 +125,7 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
 
 
   /** */
-  shouldUpdate(changedProperties: PropertyValues<this>) {
+  override shouldUpdate(changedProperties: PropertyValues<this>) {
     super.shouldUpdate(changedProperties);
     //console.log("<anchor-tree>.shouldUpdate()", changedProperties);
     if (changedProperties.has("rootTypedAnchor")) {
@@ -134,7 +137,7 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
 
 
   /** */
-  renderLeafAnchor(rootAnchors: TypedAnchor[]): TemplateResult<1> {
+  renderLeafAnchor(_rootAnchors: TypedAnchor[]): TemplateResult<1> {
     return html``;
   }
 
@@ -346,7 +349,7 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
 
 
   /** */
-  render() {
+  override render() {
     //console.log("<anchor-tree>.render()", this.root);
 
     let title = "Viewing ROOT";
@@ -388,7 +391,7 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
 
 
   /** */
-  async onProbeROOT(e:any) {
+  async onProbeROOT(_e: any) {
     this._level0 = [];
     this.rootTypedAnchor = undefined;
     await this.walkRootAnchor();
@@ -398,7 +401,7 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
 
 
   /** */
-  async onWalkInput(e:any) {
+  async onWalkInput(_e: any) {
     const input = this.shadowRoot!.getElementById("rootInput") as Input;
     if (!input.value) {
       this.rootTypedAnchor = undefined;
@@ -415,7 +418,7 @@ export class AnchorTree extends ZomeElement<unknown, PathExplorerZvm> {
   }
 
   /** */
-  static get styles() {
+  static override get styles() {
     return [
       css`
           :host {

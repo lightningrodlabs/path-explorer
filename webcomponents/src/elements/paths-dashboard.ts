@@ -1,5 +1,5 @@
-import {css, html} from "lit";
-import {property, state, customElement} from "lit/decorators.js";
+import {html} from "lit";
+import {state, customElement} from "lit/decorators.js";
 import {ZomeElement} from "@ddd-qc/lit-happ";
 import {encodeHashToBase64} from "@holochain/client";
 import {PathExplorerZvm} from "../viewModels/path-explorer.zvm";
@@ -29,7 +29,7 @@ export class PathsDashboard extends ZomeElement<unknown, PathExplorerZvm> {
   /** -- Methods -- */
 
   /** */
-  protected async zvmUpdated(newZvm: PathExplorerZvm, oldZvm?: PathExplorerZvm): Promise<void> {
+  protected override async zvmUpdated(newZvm: PathExplorerZvm, _oldZvm?: PathExplorerZvm): Promise<void> {
     console.log("<paths-dashboard>.zvmUpdated()");
     this._selectedHash = '';
     this._agentKeyEntryHash = encodeHashToBase64(await newZvm.zomeProxy.getAgentEntryHash());
@@ -56,7 +56,7 @@ export class PathsDashboard extends ZomeElement<unknown, PathExplorerZvm> {
     if (children.length == 0) {
       const itemLinks = await this._zvm.zomeProxy.getAllItemsFromAnchor(root_ta.anchor);
       if (itemLinks.length > 0) {
-        const tag = new TextDecoder().decode(new Uint8Array(itemLinks[0].tag));
+        const tag = new TextDecoder().decode(new Uint8Array(itemLinks[0]!.tag));
         const leaf = root_ta.anchor + tag
         console.log(`  - Anchor: LinkType="${LINK_KEYS[root_ta.linkIndex]}" path="${leaf}"`);
       }
@@ -75,7 +75,7 @@ export class PathsDashboard extends ZomeElement<unknown, PathExplorerZvm> {
 
 
   /** */
-  render() {
+  override render() {
     console.log("<paths-dashboard> render()", this._initialized, this._selectedHash);
     if (!this._initialized) {
       return html`<span>Loading...</span>`;

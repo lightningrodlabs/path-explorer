@@ -1,5 +1,4 @@
 import {HoloHashB64, ZomeName} from "@holochain/client";
-import {ItemLink} from "./bindings/deps.types";
 
 export declare type AnyLinkableHashB64 = HoloHashB64;
 

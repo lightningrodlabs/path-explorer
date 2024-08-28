@@ -4,13 +4,11 @@ import {ScopedZomeTypes, ZomeElement} from "@ddd-qc/lit-happ";
 import {AnyDhtHashB64, decodeHashFromBase64, encodeHashToBase64, ZomeName} from "@holochain/client";
 import {ItemLink} from '../bindings/deps.types';
 
-import Tree from "@ui5/webcomponents/dist/Tree"
 import TreeItem from "@ui5/webcomponents/dist/TreeItem";
 import BusyIndicator from "@ui5/webcomponents/dist/BusyIndicator";
 
 import {PathExplorerZvm} from "../viewModels/path-explorer.zvm";
-import {linkType2NamedStr, linkType2str, utf32Decode} from "../utils";
-import {TypedAnchor} from "../bindings/path-explorer.types";
+import {linkType2NamedStr, utf32Decode} from "../utils";
 
 
 /**
@@ -30,8 +28,8 @@ export class LinkList extends ZomeElement<unknown, PathExplorerZvm> {
   @state() private _itemLinks: ItemLink[] = [];
   @state() private _linkTypes: ScopedZomeTypes = [];
   @state() private _zomeNames: ZomeName[] = [];
-  @state() private _selectedZomeLinks: ScopedZomeTypes = [];
-  @state() private _linkTypeFilter?: number;
+  //@state() private _selectedZomeLinks: ScopedZomeTypes = [];
+  @state() private _linkTypeFilter: number | undefined = undefined;
 
 
   /** */
@@ -47,7 +45,7 @@ export class LinkList extends ZomeElement<unknown, PathExplorerZvm> {
 
 
   /** */
-   shouldUpdate(changedProperties: PropertyValues<this>) {
+   override shouldUpdate(changedProperties: PropertyValues<this>) {
     super.shouldUpdate(changedProperties);
     //console.log("ZomeElement.shouldUpdate() start", !!this._zvm, this.installedCell);
     if (changedProperties.has("base") && this._zvm) {
@@ -58,7 +56,7 @@ export class LinkList extends ZomeElement<unknown, PathExplorerZvm> {
 
 
   /** */
-  protected async zvmUpdated(newZvm: PathExplorerZvm, oldZvm?: PathExplorerZvm): Promise<void> {
+  protected override async zvmUpdated(newZvm: PathExplorerZvm, _oldZvm?: PathExplorerZvm): Promise<void> {
     console.log("<link-list>.zvmUpdated()", this.base);
     const zi = await newZvm.zomeProxy.zomeInfo();
     console.log({zi});
@@ -159,14 +157,14 @@ export class LinkList extends ZomeElement<unknown, PathExplorerZvm> {
 
 
   /** */
-  async onZomeSelect(e: any) {
+  async onZomeSelect(_e: any) {
     //console.log("onZomeSelect() CALLED", e)
     //this._selectedZomeLinks = this._zv
   }
 
 
   /** */
-  async onLinkTypeSelect(e: any) {
+  async onLinkTypeSelect(_e: any) {
     //console.log("onLinkTypeSelect() CALLED", e)
     const selector = this.shadowRoot!.getElementById("linkTypeSelector") as HTMLSelectElement;
     if (!selector || !selector.value) {
@@ -179,7 +177,7 @@ export class LinkList extends ZomeElement<unknown, PathExplorerZvm> {
 
 
   /** */
-  onProbe(e:any) {
+  onProbe(_e:any) {
     const input = this.shadowRoot!.getElementById("baseInput") as HTMLInputElement;
     this.base = input.value;
     this._itemLinks = [];
@@ -187,7 +185,7 @@ export class LinkList extends ZomeElement<unknown, PathExplorerZvm> {
 
 
   /** */
-  render() {
+  override render() {
     //console.log(`<link-list> render(): ${this.rootHash}`);
     if (!this._zomeNames) {
       return html`Loading...`;
@@ -217,7 +215,7 @@ export class LinkList extends ZomeElement<unknown, PathExplorerZvm> {
           </select>
           <span>, link type:</span>
           <select name="linkTypeSelector" id="linkTypeSelector" @click=${this.onLinkTypeSelect}>
-              ${this._linkTypes.length > 0? this._linkTypes[0].map(
+              ${this._linkTypes.length > 0? this._linkTypes[0]!.map(
                       (linkIndex) => {
                           return html`<option>${linkIndex}</option>`
                       }
@@ -233,7 +231,7 @@ export class LinkList extends ZomeElement<unknown, PathExplorerZvm> {
 
 
   /** */
-  static get styles() {
+  static override get styles() {
     return [
       css`
           :host {

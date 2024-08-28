@@ -12,12 +12,12 @@
     <tasker-app></tasker-app>
 
     <script type="module">
-      console.log("   HC_PORT:", process.env.HC_PORT);
-      console.log("ADMIN_PORT:", process.env.ADMIN_PORT);   
+      console.log("  HC_APP_PORT:", process.env.HC_APP_PORT);
+      console.log("HC_ADMIN_PORT:", process.env.HC_ADMIN_PORT);
       //import {ContextRoot} from '@lit-labs/context';
       //const root = new ContextRoot();
-      //root.attach(document.body);         
-      import { TaskerApp } from "./dist";
+      //root.attach(document.body);
+      import { TaskerApp } from "./";
       customElements.define("tasker-app", TaskerApp);
     </script>
 

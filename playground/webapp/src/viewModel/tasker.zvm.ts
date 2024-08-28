@@ -5,11 +5,10 @@ import {
   encodeHashToBase64,
   EntryHash,
   EntryHashB64,
-  ZomeName
 } from "@holochain/client";
 import {TaskerProxy} from '../bindings/tasker.proxy';
 import {TaskItem} from '../bindings/tasker.types';
-import {ZomeViewModel, CellProxy, DnaViewModel} from "@ddd-qc/lit-happ";
+import {ZomeViewModel} from "@ddd-qc/lit-happ";
 import {TaskerPerspective, TaskItemMaterialized, TaskListMaterialized} from "./tasker.perspective";
 
 
@@ -19,7 +18,7 @@ import {TaskerPerspective, TaskItemMaterialized, TaskListMaterialized} from "./t
  */
 export class TaskerZvm extends ZomeViewModel {
 
-  static readonly ZOME_PROXY = TaskerProxy;
+  static override readonly ZOME_PROXY = TaskerProxy;
   get zomeProxy(): TaskerProxy {return this._zomeProxy as TaskerProxy;}
 
 
@@ -84,7 +83,7 @@ export class TaskerZvm extends ZomeViewModel {
 
 
   /** */
-  async probeAll() {
+  override async probeAll() {
     console.log("taskerViewModel.probeAll() called");
     /** Reset perspective */
     this._perspective.taskListEntries = {};

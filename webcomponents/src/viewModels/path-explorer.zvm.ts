@@ -1,5 +1,5 @@
 import {PathExplorerProxy} from "../bindings/path-explorer.proxy";
-import {delay, Dictionary, ZomeViewModel} from "@ddd-qc/lit-happ";
+import {ZomeViewModel} from "@ddd-qc/lit-happ";
 import {ZomeName} from "@holochain/client";
 
 /**
@@ -7,7 +7,7 @@ import {ZomeName} from "@holochain/client";
  */
 export class PathExplorerZvm extends ZomeViewModel {
 
-  static readonly ZOME_PROXY = PathExplorerProxy;
+  static override readonly ZOME_PROXY = PathExplorerProxy;
 
   get zomeProxy(): PathExplorerProxy {
     return this._zomeProxy as PathExplorerProxy;
@@ -37,14 +37,22 @@ export class PathExplorerZvm extends ZomeViewModel {
   /** Should probably cache dnaInfo at init and not have this fn be async */
   async getZomeName(zomeIndex: number): Promise<ZomeName> {
     const dnaInfo = await this._zomeProxy.dnaInfo();
-    return dnaInfo.zome_names[zomeIndex];
+    const maybe = dnaInfo.zome_names[zomeIndex];
+    if (!maybe) {
+      throw Promise.reject("Unknown zomeIndex");
+    }
+    return maybe;
   }
 
 
   /** Should probably cache dnaInfo at init and not have this fn be async */
   async getEntryName(zomeName: ZomeName, entryIndex: number): Promise<string> {
     const entryDefs = await this.zomeProxy.callEntryDefs(zomeName);
-    return entryDefs[entryIndex][0];
+    const def = entryDefs[entryIndex];
+    if (!def || !("App" in def.id)) {
+      throw Promise.reject("No entryDef found");
+    }
+    return def.id.App;
   }
 
 

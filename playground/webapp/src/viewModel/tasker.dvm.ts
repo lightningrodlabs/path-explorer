@@ -13,8 +13,8 @@ import {ProfilesAltZvm} from "@ddd-qc/profiles-dvm";
 
   /** -- DnaViewModel Interface -- */
 
-  static readonly DEFAULT_BASE_ROLE_NAME = "rTasker";
-  static readonly ZVM_DEFS: ZvmDef[] = [
+  static override readonly DEFAULT_BASE_ROLE_NAME = "rTasker";
+  static override readonly ZVM_DEFS: ZvmDef[] = [
    TaskerZvm,
    PathExplorerZvm,
    [AgentDirectoryZvm, "zAgentDirectory"],
