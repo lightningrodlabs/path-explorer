@@ -34,12 +34,6 @@ export class TaskerZvm extends ZomeViewModel {
   /* */
   get perspective(): TaskerPerspective {return this._perspective}
 
-  /* */
-  protected hasChanged(): boolean {
-    // TODO
-    return true;
-  }
-
 
   /** -- Methods -- */
 

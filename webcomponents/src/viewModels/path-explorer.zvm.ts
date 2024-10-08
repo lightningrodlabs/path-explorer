@@ -13,21 +13,12 @@ export class PathExplorerZvm extends ZomeViewModel {
     return this._zomeProxy as PathExplorerProxy;
   }
 
-  /* */
-  protected hasChanged(): boolean {
-    if (!this._previousPerspective) {
-      return true;
-    }
-    let hasChanged = true; // FIXME
-    return hasChanged;
-  }
-
 
   /** -- Perspective -- */
 
   /* */
-  get perspective(): unknown {
-    return undefined;
+  get perspective(): Object {
+    return {};
   }
 
 

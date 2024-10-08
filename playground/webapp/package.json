@@ -1,10 +1,14 @@
 {
   "name": "tasker",
   "version": "0.1.0",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "typings": "./dist/index.d.ts",
   "scripts": {
     "lint": "eslint --ext .ts .",
     "tsc": "tsc",
-    "build": "rm -rf dist && tsc && rollup -c rollup.config.js",
+    "build": "rm -rf dist && tsc",
+    "dist": "npm run build && rollup -c rollup.config.js",
     "build:watch": "tsc -w --incremental --preserveWatchOutput",
     "start:ui": "concurrently --names tsc,dev-server \"npm run build:watch\" \"web-dev-server --config ./web-dev-server.config.mjs\"",
     "package": "rm -rf ui.zip && cd dist && bestzip ../ui.zip * && cd .. && hc web-app pack ./webhapp.workdir",
@@ -34,8 +38,12 @@
     "typescript": "~5.2.0"
   },
   "dependencies": {
-    "@ddd-qc/agent-directory": "6.8.0",
-    "@ddd-qc/profiles-dvm": "0.29.0",
+    "@ddd-qc/agent-directory": "6.9.0",
+    "@ddd-qc/profiles-dvm": "0.29.3",
+    "@lit/localize": "0.12.1",
+    "@lit/context": "1.0.1",
+    "lit": "3.0.2",
+    "@holochain-open-dev/elements": "0.400.0-dev.0",
     "@ddd-qc/path-explorer": "file:../../webcomponents"
   }
 }

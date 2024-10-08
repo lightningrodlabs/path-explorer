@@ -74,8 +74,9 @@ export class TaskerApp extends HappElement {
     /** Probe */
     this._cell = this.taskerDvm.cell;
     await this.hvm.probeAll();
-    this._allAppEntryTypes = await this.taskerDvm.fetchAllEntryDefs();
-    console.log("happInitialized(), _allAppEntryTypes", this._allAppEntryTypes);
+
+    //this._allAppEntryTypes = await this.taskerDvm.fetchAllEntryDefs();
+    //console.log("happInitialized(), _allAppEntryTypes", this._allAppEntryTypes);
 
     const dummyProfile: Profile = {
       nickname: "camille",

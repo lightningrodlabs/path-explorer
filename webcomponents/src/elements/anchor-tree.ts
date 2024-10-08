@@ -6,12 +6,13 @@ import {decodeHashFromBase64, encodeHashToBase64, ZomeName} from "@holochain/cli
 
 import TreeItem from "@ui5/webcomponents/dist/TreeItem";
 import BusyIndicator from "@ui5/webcomponents/dist/BusyIndicator";
+import Input from "@ui5/webcomponents/dist/Input";
+
 import "@ui5/webcomponents/dist/Tree.js"
 import "@ui5/webcomponents/dist/TreeItem.js";
 import "@ui5/webcomponents/dist/BusyIndicator.js";
 
 import "@ui5/webcomponents/dist/Icon.js";
-import Input from "@ui5/webcomponents/dist/Input";
 import "@ui5/webcomponents/dist/Input.js";
 import "@ui5/webcomponents/dist/features/InputSuggestions.js";
 

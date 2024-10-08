@@ -1,6 +1,6 @@
 {
   "name": "@ddd-qc/path-explorer",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "lit-happ elements for browsing Paths & Links.",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -11,8 +11,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "build:watch": "tsc --watch --preserveWatchOutput",
-    "analyze": "lit-analyzer src --failFast"
+    "build:watch": "tsc --watch --preserveWatchOutput"
   },
   "repository": {
     "type": "git",
@@ -26,7 +25,6 @@
   "homepage": "https://github.com/lightningrodlabs/path-explorer#readme",
   "devDependencies": {
     "@types/ws": "^8.5.3",
-    "lit-analyzer": "^1.2.1",
     "tslib": "^2.4.0",
     "typescript": "~5.2.0",
     "watch-cli": "^0.2.3"
@@ -36,7 +34,8 @@
     "@ui5/webcomponents-fiori": "=1.13.3",
     "@ui5/webcomponents-icons": "=1.13.3",
     "@shoelace-style/shoelace": "2.4.0",
-    "cqfill": "0.6.0",
-    "js-base64": "^3.7.3"
+    "js-base64": "^3.7.3",
+    "@lit/context": "1.0.1",
+    "lit": "3.0.2"
   }
 }

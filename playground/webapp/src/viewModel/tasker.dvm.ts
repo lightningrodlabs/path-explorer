@@ -1,7 +1,7 @@
 import {AppSignalCb} from "@holochain/client";
 import { DnaViewModel, ZvmDef } from "@ddd-qc/lit-happ";
 import {AgentDirectoryZvm} from "@ddd-qc/agent-directory"
-import {PathExplorerZvm} from "@ddd-qc/path-explorer/dist/viewModels/path-explorer.zvm";
+import {PathExplorerZvm} from "@ddd-qc/path-explorer";
 import {TaskerZvm} from "./tasker.zvm"
 import {ProfilesAltZvm} from "@ddd-qc/profiles-dvm";
 
@@ -33,9 +33,7 @@ import {ProfilesAltZvm} from "@ddd-qc/profiles-dvm";
 
   /** -- ViewModel Interface -- */
 
-  protected hasChanged(): boolean {return true}
-
-  get perspective(): void {return}
+  get perspective(): Object {return {}}
 
 
   /** -- */
