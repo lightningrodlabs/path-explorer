@@ -38,8 +38,8 @@
     "typescript": "~5.2.0"
   },
   "dependencies": {
-    "@ddd-qc/agent-directory": "6.9.0",
-    "@ddd-qc/profiles-dvm": "0.29.3",
+    "@ddd-qc/agent-directory": "6.10.0",
+    "@ddd-qc/profiles-dvm": "0.30.0",
     "@lit/localize": "0.12.1",
     "@lit/context": "1.0.1",
     "lit": "3.0.2",
