@@ -26,12 +26,12 @@ non_snake_case = "allow"
 unused_attributes = "allow"
 
 [workspace.dependencies]
-serde = { version = "=1.0.197", default-features = false }
-hdi = { version = "=0.4.1", default-features = false }
-hdk = { version = "=0.3.1", default-features = false }
+serde = { version = "=1.0.203", default-features = false }
+hdi = { version = "=0.4.4", default-features = false }
+hdk = { version = "=0.3.4", default-features = false }
 
-zome_utils = { git = "https://github.com/ddd-mtl/zome-utils", branch = "hdk-3.1" }
-time_indexing = { git = "https://github.com/ddd-mtl/time-indexing", branch = "hdk-3.1" }
+zome_utils = { git = "https://github.com/ddd-mtl/zome-utils", branch = "hdk-3.2" }
+time_indexing = { git = "https://github.com/ddd-mtl/time-indexing", branch = "hdk-3.2" }
 
 [profile.dev]
 lto = false
