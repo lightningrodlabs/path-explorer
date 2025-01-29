@@ -4,13 +4,13 @@ members = [
   # PathExplorer Zome
   "crates/path_explorer",
   # Playground
-  "playground/zomes/tasker_model",
-  "playground/zomes/tasker",
-  "playground/zomes/agent_directory",
-  "playground/zomes/agent_directory_integrity",
-  "playground/zomes/profiles",
-  "playground/zomes/profiles_integrity",
-  #"sweettest",
+  #"playground/zomes/tasker_model",
+  #"playground/zomes/tasker",
+  #"playground/zomes/agent_directory",
+  #"playground/zomes/agent_directory_integrity",
+  #"playground/zomes/profiles",
+  #"playground/zomes/profiles_integrity",
+  ##"sweettest",
 ]
 
 [workspace.package]
@@ -27,11 +27,11 @@ unused_attributes = "allow"
 
 [workspace.dependencies]
 serde = { version = "=1.0.203", default-features = false }
-hdi = { version = "=0.5.0-rc.1", default-features = false }
-hdk = { version = "=0.4.0-rc.1", default-features = false }
+hdi = { version = "=0.5.1", default-features = false }
+hdk = { version = "=0.4.1", default-features = false }
 
-zome_utils = { git = "https://github.com/ddd-mtl/zome-utils", branch = "hdk-4.0-dev.20" }
-time_indexing = { git = "https://github.com/ddd-mtl/time-indexing", branch = "hdk-4.0-dev.20" }
+zome_utils = { git = "https://github.com/ddd-mtl/zome-utils", branch = "hdk-4.1" }
+time_indexing = { git = "https://github.com/ddd-mtl/time-indexing", branch = "hdk-4.1" }
 
 [profile.dev]
 lto = false
