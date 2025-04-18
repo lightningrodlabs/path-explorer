@@ -15,5 +15,5 @@ fn get_dna_info(_:()) -> ExternResult<DnaInfo> {
 
 #[hdk_extern]
 fn get_agent_entry_hash(_:()) -> ExternResult<AnyLinkableHash> {
-  Ok(AnyLinkableHash::from(EntryHash::from(agent_info()?.agent_latest_pubkey)))
+  Ok(AnyLinkableHash::from(EntryHash::from(agent_info()?.agent_initial_pubkey)))
 }
