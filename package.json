@@ -2,8 +2,8 @@
   "name": "path-explorer-root",
   "version": "0.4.0",
   "config": {
-    "hc_version": "0.4.0-dev.27",
-    "zits_version": "1.16.3",
+    "hc_version": "0.5.0-rc.4",
+    "zits_version": "1.16.4",
     "bin": "bin"
   },
   "workspaces": [
