@@ -7,7 +7,7 @@ import {
 import "@ddd-qc/path-explorer";
 import { TaskerDvm } from "./viewModel/tasker.dvm";
 import {Profile} from "@ddd-qc/profiles-dvm";
-import {Dictionary, EntryDef} from "@ddd-qc/cell-proxy";
+import {MyDictionary, EntryDef} from "@ddd-qc/cell-proxy";
 
 
 
@@ -16,30 +16,24 @@ import {Dictionary, EntryDef} from "@ddd-qc/cell-proxy";
  */
 export class TaskerApp extends HappElement {
 
-  // /** Ctor */
-  // constructor() {
-  //   super(Number(process.env.HC_APP_PORT)); // FIXME add adminUrl
-  // }
-
-  /** All arguments should be provided when constructed explicity */
-  /** @ts-ignore */
-  constructor(appWs?: AppWebsocket, private _adminWs?: AdminWebsocket, readonly appId?: InstalledAppId) {
-    /** Figure out arguments for super() */
-    const appPort: number = Number(process.env.HC_APP_PORT);
-    const adminUrl = _adminWs
-      ? undefined
-      : process.env.HC_ADMIN_PORT
-        ? new URL(`ws://localhost:${process.env.HC_ADMIN_PORT}`)
-        : undefined;
-    super(appWs? appWs : appPort, appId, adminUrl);
-  }
-
-
   /** HvmDef */
   static override readonly HVM_DEF: HvmDef = {
     id: "hTasker",
     dvmDefs: [{ctor: TaskerDvm, isClonable: true}],
   };
+
+  /** All arguments should be provided when constructed explicitly */
+  /* @ts-ignore */
+  constructor(appWs?: AppWebsocket, private adminWs?: AdminWebsocket, readonly appId?: InstalledAppId) {
+    /** Figure out arguments for super() */
+    const appPort: number = Number(process.env.HC_APP_PORT);
+    const adminUrl = adminWs
+        ? undefined
+        : process.env.HC_ADMIN_PORT
+            ? new URL(`ws://localhost:${process.env.HC_ADMIN_PORT}`)
+            : undefined;
+    super(appWs? appWs : appPort, appId, adminUrl, 10 * 1000);
+  }
 
   /** QoL */
   get taskerDvm(): TaskerDvm { return this.hvm.getDvm(TaskerDvm.DEFAULT_BASE_ROLE_NAME)! as TaskerDvm }
@@ -52,7 +46,7 @@ export class TaskerApp extends HappElement {
 
   private _pageDisplayIndex: number = 0;
   /** ZomeName -> (AppEntryDefName, isPublic) */
-  private _allAppEntryTypes: Dictionary<Dictionary<EntryDef>> = {};
+  private _allAppEntryTypes: MyDictionary<MyDictionary<EntryDef>> = {};
 
 
   @state() private _cell?: Cell;
