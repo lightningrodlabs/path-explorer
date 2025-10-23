@@ -9,7 +9,7 @@ import {
 WebsocketConnectionOptions, WsClientOptions, HolochainError, CloneIdHelper,
 /** types.ts */
 // @ts-ignore
-KitsuneAgent, KitsuneSpace, HoloHashB64, AgentPubKeyB64, DnaHashB64, WasmHashB64, EntryHashB64, ActionHashB64, AnyDhtHashB64, InstalledAppId, Signature, CellId, DnaProperties, RoleName, InstalledCell, Timestamp, Duration, HoloHashed, FetchPoolInfo,
+KitsuneAgent, KitsuneSpace, HoloHashB64, AgentPubKeyB64, DnaHashB64, WasmHashB64, EntryHashB64, ActionHashB64, AnyDhtHashB64, InstalledAppId, Signature, CellId, DnaProperties, RoleName, InstalledCell, Timestamp, HoloHashed, FetchPoolInfo,
 /** hdk/action.ts */
 // @ts-ignore
 SignedAction, SignedActionHashed, RegisterAgentActivity, ActionHashed, ActionType, Action, NewEntryAction, Dna, AgentValidationPkg, InitZomesComplete, CreateLink, DeleteLink, OpenChain, CloseChain, Update, Delete, Create,
@@ -41,7 +41,7 @@ ZomeIndex, LinkType, LinkTag, RateWeight, RateBucketId, RateUnits, Link,
 /** api/admin/types.ts */
 // @ts-ignore
 // YamlProperties
-Zomes, WasmCode, DisabledAppReason, AppInfoStatus, StemCell, ProvisionedCell, ClonedCell, CellType, CellInfo, AppInfo, MembraneProof, MemproofMap, RoleSettingsMap, RoleSettings, DnaModifiersOpt, DnaModifiers, FunctionName, ZomeName, ZomeDefinition, IntegrityZome, CoordinatorZome, DnaDefinition, ResourceBytes, ResourceMap, CellProvisioningStrategy, CellProvisioning, DnaVersionSpec, DnaVersionFlexible, AppRoleDnaManifest, AppRoleManifest, AppManifest, AppBundle, AppBundleSource, NetworkSeed, AppStatusFilter, AppInterfaceInfo, AgentInfoSigned, ZomeLocation, DnaManifest,
+Zomes, WasmCode, CapGrantInfo, PeerMetaInfo, DisabledAppReason, AppStatus, StemCell, ProvisionedCell, ClonedCell, CellType, CellInfo, AppInfo, MembraneProof, MemproofMap, RoleSettingsMap, RoleSettings, DnaModifiersOpt, DnaModifiers, FunctionName, ZomeName, ZomeDefinition, IntegrityZome, CoordinatorZome, DnaDefinition, ResourceBytes, ResourceMap, CellProvisioningStrategy, CellProvisioning, DnaVersionSpec, DnaVersionFlexible, AppRoleDnaManifest, AppRoleManifest, AppManifest, AppBundle, AppBundleSource, NetworkSeed, AppStatusFilter, AppInterfaceInfo, AgentInfoSigned, ZomeLocation, DnaManifest,
 } from '@holochain/client';
 
 
@@ -81,7 +81,8 @@ ValidationStatus, ValidationReceipt,
 
 import {ZomeProxy} from '@ddd-qc/lit-happ';
 import {taskerFunctionNames} from './tasker.fn';
-
+import {TaskerUnitEnum} from './tasker.integrity';
+import {TaskerLinkType} from './tasker.integrity';
 
 /**
  *
@@ -89,8 +90,8 @@ import {taskerFunctionNames} from './tasker.fn';
 export class TaskerProxy extends ZomeProxy {
   static override readonly DEFAULT_ZOME_NAME = "zTasker";
   static override readonly FN_NAMES = taskerFunctionNames;
-  static override readonly ENTRY_TYPES = [];
-  static override readonly LINK_TYPES = [];
+  static override readonly ENTRY_TYPES = Object.values(TaskerUnitEnum);
+  static override readonly LINK_TYPES = Object.values(TaskerLinkType);
  
   async createTaskList(title: string): Promise<ActionArray> {
     return this.call('create_task_list', title);
