@@ -42,7 +42,7 @@ pub fn get_typed_anchor(anchor: String) -> ExternResult<(EntryHashB64, Option<Ty
     }
     debug!("no match found");
   } else {
-    let root_anchors = get_all_root_anchors(())?;
+    let root_anchors = get_all_root_anchors(GetStrategy::Network)?;
     debug!("root_anchors: {:?}", root_anchors);
     for root_anchor in root_anchors {
       if root_anchor.anchor == anchor {

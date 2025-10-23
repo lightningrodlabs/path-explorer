@@ -1,6 +1,5 @@
 use hdk::prelude::*;
 use tasker_model::*;
-use zome_utils::*;
 
 #[hdk_extern]
 pub fn create_task_list(title: String) -> ExternResult<ActionHash> {
@@ -127,6 +126,6 @@ pub fn complete_task(task_eh: EntryHash) -> ExternResult<ActionHash> {
 #[hdk_extern]
 fn is_list_locked(list_eh: EntryHash) -> ExternResult<bool> {
    std::panic::set_hook(Box::new(zome_utils::zome_panic_hook));
-   let locked_links = get_links(link_input(list_eh.clone(), TaskerLinkType::Locked, None))?;
+   let locked_links = get_links(LinkQuery::new(list_eh.clone(), TaskerLinkType::Locked.try_into_filter().unwrap()), GetStrategy::Network)?;
    Ok(locked_links.len() > 0)
 }

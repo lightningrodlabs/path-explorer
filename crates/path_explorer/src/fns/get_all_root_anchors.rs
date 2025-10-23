@@ -7,13 +7,12 @@ use path_explorer_types::*;
 /// Return all RootAnchors from all Zomes.
 /// A RootAnchor is a path linked from the ROOT entry.
 #[hdk_extern]
-pub fn get_all_root_anchors(_ : ()) -> ExternResult<Vec<TypedAnchor>> {
+pub fn get_all_root_anchors(strategy : GetStrategy) -> ExternResult<Vec<TypedAnchor>> {
   /// Check for links on all link types
-  let links = get_links(link_input(
+  let links = get_links(LinkQuery::new(
     root_hash()?,
-    LinkTypeFilter::Dependencies(dna_zomes()), // LinkTypeFilter::single_type(zome_index, link_type)
-    None, //Some(self.make_tag()?),
-  ))?;
+    LinkTypeFilter::Dependencies(dna_zomes()).try_into_filter().unwrap(),
+  ), strategy)?;
   let mut res = Vec::new();
   for link in links {
     let Ok(str) = compTag2str(&link.tag)

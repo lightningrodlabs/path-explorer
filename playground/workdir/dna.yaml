@@ -1,27 +1,27 @@
 ---
-manifest_version: "1"
+manifest_version: "0"
 name: dTasker
 integrity:
   zomes:
     - name: tasker_model
-      bundled: ../../target/wasm32-unknown-unknown/release/tasker_model.wasm
+      path: ../../target/wasm32-unknown-unknown/release/tasker_model.wasm
     - name: agent_directory_integrity
-      bundled: ../../target/wasm32-unknown-unknown/release/agent_directory_integrity.wasm
+      path: ../../target/wasm32-unknown-unknown/release/agent_directory_integrity.wasm
     - name: profiles_integrity
-      bundled: ../../target/wasm32-unknown-unknown/release/profiles_integrity_zome.wasm
+      path: ../../target/wasm32-unknown-unknown/release/profiles_integrity_zome.wasm
 coordinator:
   zomes:
     - name: zPathExplorer
-      bundled: ../../target/wasm32-unknown-unknown/release/path_explorer.wasm
+      path: ../../target/wasm32-unknown-unknown/release/path_explorer.wasm
     - name: zTasker
-      bundled: ../../target/wasm32-unknown-unknown/release/tasker.wasm
+      path: ../../target/wasm32-unknown-unknown/release/tasker.wasm
       dependencies:
         - name: tasker_model
     - name: zAgentDirectory
-      bundled: ../../target/wasm32-unknown-unknown/release/agent_directory.wasm
+      path: ../../target/wasm32-unknown-unknown/release/agent_directory.wasm
       dependencies:
         - name: agent_directory_integrity
     - name: profiles
-      bundled: ../../target/wasm32-unknown-unknown/release/profiles_zome.wasm
+      path: ../../target/wasm32-unknown-unknown/release/profiles_zome.wasm
       dependencies:
         - name: profiles_integrity

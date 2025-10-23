@@ -41,7 +41,7 @@ pub fn get_any_children(parent_path: Path, link_tag: Option<LinkTag>) -> ExternR
     parent_path.path_entry_hash()?,
     all_dna_link_types(),
     link_tag,
-  ))?;
+  ), GetStrategy::Network)?;
   /// Only need one of each hash.
   children.sort_unstable_by(|a, b| a.tag.cmp(&b.tag));
   children.dedup_by(|a, b| a.tag.eq(&b.tag));
