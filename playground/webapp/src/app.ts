@@ -1,5 +1,5 @@
 import { html } from "lit";
-import {state} from "lit/decorators.js";
+import {customElement, state} from "lit/decorators.js";
 import {AdminWebsocket, AppWebsocket, DnaDefinition, InstalledAppId, RoleName} from "@holochain/client";
 import {
   HvmDef, HappElement, HCL, Cell,
@@ -11,9 +11,8 @@ import {MyDictionary, EntryDef} from "@ddd-qc/cell-proxy";
 
 
 
-/**
- *
- */
+/** */
+@customElement("tasker-app")
 export class TaskerApp extends HappElement {
 
   /** HvmDef */

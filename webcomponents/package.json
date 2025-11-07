@@ -1,6 +1,6 @@
 {
   "name": "@ddd-qc/path-explorer",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "lit-happ elements for browsing Paths & Links.",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -10,8 +10,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc",
-    "build:watch": "tsc --watch --preserveWatchOutput"
+    "build"       : "rm -rf dist && tsc",
+    "build:watch" : "tsc --watch --preserveWatchOutput"
   },
   "repository": {
     "type": "git",
@@ -35,7 +35,6 @@
     "@ui5/webcomponents-icons": "=1.13.3",
     "@shoelace-style/shoelace": "2.4.0",
     "js-base64": "^3.7.3",
-    "@lit/context": "1.0.1",
-    "lit": "3.0.2"
+    "cqfill": "^0.6.0"
   }
 }

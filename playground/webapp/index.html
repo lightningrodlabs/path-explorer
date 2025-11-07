@@ -2,8 +2,6 @@
 <html lang="en-GB">
   <head>
     <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta charset="utf-8" />
     <style>
       body {
         background: #fafafa;
@@ -14,14 +12,12 @@
     <tasker-app></tasker-app>
 
     <script type="module">
+      console.log("playground/webapp/index.html");
       console.log("  HC_APP_PORT:", process.env.HC_APP_PORT);
       console.log("HC_ADMIN_PORT:", process.env.HC_ADMIN_PORT);
-      //import {ContextRoot} from '@lit-labs/context';
-      //const root = new ContextRoot();
-      //root.attach(document.body);
-      import { TaskerApp } from "./";
-      customElements.define("tasker-app", TaskerApp);
     </script>
+
+    <script type="module" src="./src/index.ts"></script>
 
   </body>
 </html>

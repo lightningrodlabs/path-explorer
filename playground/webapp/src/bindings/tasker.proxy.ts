@@ -70,7 +70,10 @@ import {
 DhtOpHashB64, DhtOpHash,
 /** DnaFile */
 // @ts-ignore
-DnaFile, DnaDef,
+DnaFile,
+/** entry */
+// @ts-ignore
+EntryDefLocation, EntryDefLocationType, AppEntryDefLocation, GetOptions, GetStrategy,
 /** entry-details */
 // @ts-ignore
 EntryDetails, RecordDetails, Details, DetailsType, EntryDhtStatus,
@@ -119,5 +122,9 @@ export class TaskerProxy extends ZomeProxy {
 
   async getAllLists(): Promise<[EntryArray, TaskList][]> {
     return this.call('get_all_lists', null);
+  }
+
+  async getAgentEntryHash(): Promise<AnyLinkableArray> {
+    return this.call('get_agent_entry_hash', null);
   }
 }

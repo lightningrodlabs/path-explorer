@@ -15,6 +15,7 @@ export const taskerFunctionNames: FunctionName[] = [
 	"get_task_item",
 	"get_list_items",
 	"get_all_lists",
+	"get_agent_entry_hash",
 ];
 
 
