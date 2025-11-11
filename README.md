@@ -1,3 +1,5 @@
+** REPO ARCHIVED. MOVED TO ZDK AND [LIT-HAPP](https://github.com/ddd-mtl/lit-happ) REPOS **
+
 # path-explorer
 
 A holochain zome module for exploring all Paths available in a DHT
